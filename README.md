@@ -30,6 +30,8 @@ The plugin lives at `dsk/` inside this repository, so the repo doubles as a sing
 /plugin install dsk@design-system-kernel
 ```
 
+> If this repo has moved (forked, or relocated to a different owner/org), substitute the current `<owner>/<repo>` in the first command. The marketplace name (`design-system-kernel`) and plugin name (`dsk`) stay the same.
+
 For local development without going through the marketplace flow, clone the repo and load the plugin folder directly:
 
 ```
