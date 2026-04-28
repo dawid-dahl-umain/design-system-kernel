@@ -5,7 +5,7 @@ High-level diagrams of the three core DSK lifecycles. Each is an agentic flow; d
 The DSK pipeline has two named stages that show up in setup and sync:
 
 - **Snapshot stage**: an engine skill (`dsk:snapshot-<format>`, e.g. `dsk:snapshot-ppt` for PowerPoint) reads the source of truth and writes the `DesignSystemSnapshot` (slide-specific data plus PNG screenshots). Each source format has its own engine skill; the manifest's `engine` field selects which one.
-- **Build stage**: the agent reads the snapshot and the kernel briefs and produces two artifact categories — **renditions** (web-rendered versions of every layout and example, the actual slides compose reuses) and **library pages** (the browser around them). Visual output, in a different medium than the declared source. Renditions may pause to ask the user for design-system direction; library page chrome does not.
+- **Build stage**: the agent reads the snapshot and the kernel briefs and produces two artifact categories — **renditions** (web-rendered versions of every layout, example, and content item, the actual slides and content pieces compose reuses) and **library pages** (the browser around them). Visual output, in a different medium than the declared source. Renditions may pause to ask the user for design-system direction; library page chrome does not.
 
 ## 0. Overview — the whole lifecycle end to end
 
@@ -65,7 +65,7 @@ flowchart TD
     RunSnapshot --> SnapshotWritten["Snapshot written: snapshot.json + PNG assets in snapshot/"]
     SnapshotWritten --> Build["Build stage: agent reads the snapshot + the kernel briefs"]
     Build --> CheckDS{"Design system available? (host feature, or user-provided in project)"}
-    CheckDS -->|Yes| Renditions["Generate renditions: one HTML file per layout and example, in library/renditions/"]
+    CheckDS -->|Yes| Renditions["Generate renditions: one HTML file per layout, example, and content type, in library/renditions/{layouts,examples,content}/"]
     CheckDS -->|No| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
     AskUser --> Renditions
     Renditions --> LibraryProduced["Library produced: renditions + browser pages (welcome, layouts, examples, content gallery)"]

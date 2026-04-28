@@ -36,7 +36,7 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 - `dsk:help` — project state diagnostic and onboarding.
 - `dsk:setup` — first-time install.
 - `dsk:snapshot-ppt` — stage 1: read a PowerPoint source, write snapshot.
-- `dsk:build` — stage 2: read snapshot + briefs, produce **renditions** (web-rendered layouts and examples reused by compose) plus the **library pages** that browse them.
+- `dsk:build` — stage 2: read snapshot + briefs, produce **renditions** (web-rendered layouts, examples, and content items reused by compose) plus the **library pages** that browse them.
 - `dsk:compose` — generate a slide by reusing a layout rendition and filling its placeholders.
 - `dsk:refine` — adjust a specific rendition based on user feedback (especially useful for content items like charts, tables, diagrams).
 - `dsk:sync` — reconcile after the declared source changes.

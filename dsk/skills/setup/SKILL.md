@@ -151,9 +151,9 @@ Orchestrate the first-time installation of DSK for a company project.
 
 9. **Run the build stage** by invoking `dsk:build`.
 
-   Before invoking, narrate. Suggested phrasing: "Source captured. Now generating the actual web slides — one HTML file per layout and example — plus the browser pages around them. If I can't find a design system to follow (in this host or in your project folder), I'll pause and ask you for direction first; otherwise this takes about a minute." Then run the build skill straight through. Build's own pause-for-design-system logic handles the styling-direction conversation if needed; setup just hands off.
+   Before invoking, narrate. Suggested phrasing: "Source captured. Now generating the actual web slides — one HTML file per layout, example, and content type (charts, tables, diagrams) — plus the browser pages around them. If I can't find a design system to follow (in this host or in your project folder), I'll pause and ask you for direction first; otherwise this takes about a minute." Then run the build skill straight through. Build's own pause-for-design-system logic handles the styling-direction conversation if needed; setup just hands off.
 
-   This produces `library/renditions/layouts/<id>.html` and `library/renditions/examples/<id>.html` (the actual slide renditions) plus `library/welcome.html`, `library/layouts.html`, `library/examples.html`, `library/content-gallery.html` (the browser pages).
+   This produces `library/renditions/{layouts,examples,content}/<id>.html` (the actual slide renditions) plus `library/welcome.html`, `library/layouts.html`, `library/examples.html`, `library/content-gallery.html` (the browser pages).
 
 10. **Confirm completion to the user.** Point them at `library/welcome.html` as the entry point, using whatever consumption channel your runtime supports — host-native preview if the host AI Design Tool renders HTML inline, otherwise instruct them to open the file in a browser. Then suggest they start building decks via chat.
 

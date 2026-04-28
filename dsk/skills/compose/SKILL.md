@@ -57,6 +57,7 @@ Read `snapshot/snapshot.json` from the company zone. Pick the best matching layo
 Open the chosen layout's rendition file and fill its placeholders with the user's content. The rendition already encodes the layout's structure and styling per the company's design system; your job is to populate it, not to redo it.
 
 - Identify placeholders in the rendition by their semantic class names or data attributes (matching the placeholder types from the snapshot).
+- **For content slots** (a chart placeholder, a table placeholder, a diagram placeholder), pull from `library/renditions/content/<content-id>.html` — the canonical web rendition of that content type. Adapt it with the user's specific data, but keep its structure and styling intact (the content rendition is the same template the content gallery shows; consistency across slides depends on reusing it). If no matching content rendition exists for the user's intent, classify the request via the smart layout selection rules above and ask for clarification rather than inventing a structure.
 - Use `style_hints` from metadata if present, for rendering guidance within placeholders (e.g. emphasis, callouts).
 - Use the snapshot's `notes` fields on layouts and content items for construction conventions.
 - When matching user intent to a `ContentItem` (e.g. user asks for "a Pulse Chart"), check both the structural `type` and the optional `display_name` field. `display_name` carries the company's preferred name when one exists; prefer it for user-facing matching.
