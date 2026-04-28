@@ -14,6 +14,16 @@ When a user has been browsing the library and notices a rendition that needs adj
 - User has been chatting about a specific rendition and asks for an iteration.
 - User notes a fidelity gap between a rendition and its source screenshot (especially common for content items).
 
+## Speaking to the user — UX principle
+
+You reason internally in DSK's vocabulary (direction check, DoF magnitude, fidelity correction vs web expressivity vs brand/structural divergence, ceiling, propagation). **The user does not.** When you speak to the user, translate everything to plain English — they don't need to learn DSK's classification system to get a sensible response. Many users running refine are non-technical (a marketing manager, a comms lead); keep their world readable.
+
+- **Don't say** "I'm running a Layer 1 direction check," "DoF magnitude is above ceiling," "this is a brand/structural divergence," "the rendition's `dof_level` exceeds the manifest's `silent_up_to`." These are your internal reasoning terms; never echo them at the user.
+- **Do say** things like *"Just to be sure — should the color match what your source uses, or are you asking for a new color the source doesn't have?"* or *"That's a bigger change than your current settings allow without confirmation. Want me to walk through it?"* or *"That kind of change should come from updating your source PowerPoint and re-syncing — I can't add new colors or fonts that aren't in your source. Want guidance on that path?"*
+- **Ids are OK in chat.** Users see ids in the library and refer to them; you can refer back the same way.
+- **"Rendition" is OK in moderation** since it shows up in the library UX, but "the slide", "the chart", "the layout" is often more natural for the specific thing being discussed. Pick what flows best.
+- **Propagation messages stay plain.** "This will apply to every future slide using this layout" rather than "This refinement propagates to all subsequent compose invocations using layout-id X."
+
 ## Why content items deserve extra attention
 
 Layouts and examples are mostly typographic and structural; their first-pass renditions tend to land close to source. **Content items — bar charts, tables, diagrams, callouts — are where the agent's first-pass rendition is most likely to drift from the source**, because they have many small structural details (axis ticks, legend placement, data label formatting, header backgrounds, arrow heads, bullet styles) that are easy to miss in a single pass.
@@ -34,7 +44,7 @@ Classify the requested change into one of three categories:
 
 3. **Brand or structural divergence.** Change to elements not in the source: a color not in the palette, a font not in the system, a new placeholder, a reorganized grid, a different chart type. Direction-wise, **blocked** — never apply. Hand off to `dsk:route-extension`: direct the user to update the source file and re-sync (principle 1).
 
-If the request is ambiguous about direction (could be a correction OR a divergence), **ask the user to clarify** before proceeding. Don't guess. Example: *"You asked to change the chart's accent color. Is the current rendition's color drifting from the source's color (correction), or do you want a new color that isn't in the source (divergence)? The first I can do here; the second needs a source-of-truth update."*
+If the request is ambiguous about direction (could be a correction OR a divergence), **ask the user to clarify** before proceeding. Don't guess. Example phrasing: *"Just to be sure — is the chart's color drifting from what your source uses, and you want me to bring it back? Or are you asking for a new color that isn't in your source today? I can do the first; the second needs an update to your source file first."* (Plain English; no internal labels like "correction" or "divergence" exposed.)
 
 ### Layer 2 — DoF magnitude check
 
