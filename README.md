@@ -6,7 +6,7 @@ Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor
 
 ## Repository layout
 
-- **`dsk/`** — the plugin itself. Drop into a host AI Design Tool's plugin directory, or load via `claude --plugin-dir dsk` for development. See [`dsk/README.md`](dsk/README.md) for install instructions and the skill list.
+- **`dsk/`** — the plugin itself. Install via the marketplace flow (see below), or load directly with `claude --plugin-dir dsk` for development. See [`dsk/README.md`](dsk/README.md) for the skill list.
 - **[`REQUIREMENTS.md`](REQUIREMENTS.md)** — top-level table of contents for the design.
 - **`requirements/`** — design documents (principles, architecture, types, content input, separation, snapshotting, degrees of freedom, glossary, developer testing, open questions). For DSK maintainers and contributors. The plugin runtime does not depend on these files; they describe the system from outside.
 
