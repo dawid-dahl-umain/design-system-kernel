@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (for future implementation) — anchor to repo root so we don't shadow
+# legitimate paths like dsk/skills/build/.
+node_modules/
+/dist/
+/build/
+*.log
+
+# Python (in case engines are written in Python)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.claude/

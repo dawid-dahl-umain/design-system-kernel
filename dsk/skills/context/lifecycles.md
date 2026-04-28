@@ -1,0 +1,150 @@
+# DSK lifecycles — diagrams
+
+High-level diagrams of the three core DSK lifecycles. Each is an agentic flow; diagrams describe behavior, not implementation (principle 7). Read by you (the agent) when invoked from `dsk:context`; the canonical visual reference for DSK behavior. Show these to the user when explaining where they are in the lifecycle.
+
+The DSK pipeline has two named stages that show up in setup and sync:
+
+- **Snapshot stage**: an engine skill (`dsk:snapshot-<format>`, e.g. `dsk:snapshot-ppt` for PowerPoint) reads the source of truth and writes the `DesignSystemSnapshot` (slide-specific data plus PNG screenshots). Each source format has its own engine skill; the manifest's `engine` field selects which one.
+- **Build stage**: the agent reads the snapshot and the kernel briefs and produces the library pages as web pages (HTML, CSS, JavaScript). Visual output, in a different medium than the declared source.
+
+## 0. Overview — the whole lifecycle end to end
+
+A high-level sequence of every interaction across the install/setup/build/sync lifecycle. Use this when the user asks "how does DSK work overall?" or needs to see the full picture before diving into a specific flow.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant You
+    participant DSK as DSK (in AI Design Tool)
+    participant Files as Company zone files
+
+    Note over You,Files: 1. Install (once)
+    You->>DSK: Install DSK plugin
+
+    Note over You,Files: 2. Set up a company project (once per company)
+    You->>Files: Drop PPT into source/
+    You->>DSK: "Set up DSK"
+    DSK->>DSK: Ask company name, DoF settings
+    DSK->>Files: Write manifest.yaml + AGENTS.md (with CLAUDE.md symlink)
+    DSK->>Files: Run snapshot stage
+    DSK->>Files: Run build stage
+    DSK-->>You: Ready
+
+    Note over You,Files: 3. Build a deck (slide by slide, ongoing)
+    loop For each slide in the deck
+        You->>DSK: "Make a slide for ..."
+        DSK->>Files: Read snapshot, pick layout, generate
+        DSK->>Files: Write slide to decks/dated-slug/
+        DSK-->>You: Slide delivered
+    end
+
+    Note over You,Files: 4. Sync (when source changes)
+    You->>Files: Update declared source
+    You->>DSK: Any DSK action
+    DSK-->>You: "Source updated. Sync first?"
+    You->>DSK: Confirm
+    DSK->>Files: Re-snapshot, diff, reconcile
+```
+
+The three sections below zoom in on each individual lifecycle.
+
+## 1. Setup — creating a new design system
+
+A company sets up DSK inside their AI Design Tool for the first time.
+
+```mermaid
+flowchart TD
+    Start([Empty AI Design Tool folder]) --> InstallKernel["Install DSK: copy the kernel files (skills, briefs, vocabularies) into the folder"]
+    InstallKernel --> AddSource["Add the company's declared source file to source/"]
+    AddSource --> RunSetup["Invoke /dsk:setup"]
+    RunSetup --> AskConfig["Agent asks: company name, DoF ceiling, silent threshold"]
+    AskConfig --> WriteManifest["Write the manifest (config: source path + DoF settings)"]
+    WriteManifest --> WriteAgentsMd["Write or extend AGENTS.md (project marker; with CLAUDE.md symlink for Claude tooling; existing content preserved, see principle 8)"]
+    WriteAgentsMd --> RunSnapshot["Snapshot stage: run the engine skill for the source format (e.g. dsk:snapshot-ppt for PPT)"]
+    RunSnapshot --> SnapshotWritten["Snapshot written: snapshot.json + PNG assets in snapshot/"]
+    SnapshotWritten --> Build["Build stage: agent reads the snapshot + the kernel briefs"]
+    Build --> LibraryProduced["Library produced: welcome, layouts, examples, content gallery (all rendered as web pages)"]
+    LibraryProduced --> Ready([Ready: users can chat with the agent])
+
+    classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef buildStage    fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    class RunSnapshot,SnapshotWritten snapshotStage
+    class Build,LibraryProduced buildStage
+```
+
+## 2. Compose — generating a slide
+
+Content arrives first. `ContentRequest` is the conceptual shape; in practice the agent sees one of two modes: **plain** (the user types content directly into chat — most common) or **annotated** (content arrives as a structured payload with metadata, from any producer — AI or traditional software, DSK doesn't care about the source). **If content is missing or unclear, the agent pauses and asks before any smart step — never invents content. If the agent can't classify between plain and annotated, it asks; if still ambiguous, it falls back to plain mode for robustness.** Once content is in hand, the agent performs two smart steps regardless of mode:
+
+1. **Smart layout selection**: pick the best layout from the snapshot catalog.
+2. **Smart content generation**: fill that layout with the content.
+
+Both steps draw on the same inputs: the content itself, the snapshot, the manifest's DoF settings (`ceiling` and `silent_up_to`), and metadata when present. The DoF decision (match/adapt/stretch/deviate) is the gating output of generation.
+
+If at any point the agent would otherwise have to make an assumption to proceed (no layout fits cleanly, content intent is ambiguous, a rendering choice is genuinely unclear), it pauses and asks the user instead of guessing.
+
+```mermaid
+flowchart TD
+    Start([User wants a slide]) --> Submit[Content submitted: ContentRequest]
+    Submit --> Branch{Metadata attached?}
+    Branch -->|No, plain mode| Plain[Inputs: content + snapshot + DoF settings]
+    Branch -->|Yes, annotated mode| Annotated[Inputs: content + metadata + snapshot + DoF settings]
+    Plain --> SmartPick[Smart layout selection: pick best fit from catalog; uses metadata when present]
+    Annotated --> SmartPick
+    SmartPick -.->|No fitting layout or unclear intent| ClarifyPick[Request user clarification]
+    ClarifyPick -.-> SmartPick
+    SmartPick --> SmartGen[Smart content generation: fill the layout; applies brand rules and uses metadata when present]
+    SmartGen -.->|Would otherwise have to assume| ClarifyGen[Request user clarification]
+    ClarifyGen -.-> SmartGen
+    SmartGen --> Decide{"DoF level required? (compared against manifest's silent_up_to and ceiling)"}
+    Decide -->|"At or below silent_up_to (Match only, by default)"| Silent[Generate directly; note Adapt-level changes in output]
+    Decide -->|"Above silent_up_to but at or below ceiling (Adapt by default)"| Confirm[Stop, explain rationale, ask user to confirm]
+    Decide -->|"Above ceiling (Stretch and Deviate by default)"| Block[Block: offer closest valid alternative, or invite source-of-truth update]
+    Silent --> Output[Render slide using web technologies]
+    Confirm -->|Confirmed| Output
+    Confirm -->|Rejected| Rework[Try alternate approach]
+    Block -->|Alternative accepted| Rework
+    Block -->|User opts to update source| OutOfFlow([Out of slide flow: user updates declared source, runs /dsk:sync])
+    Rework --> SmartPick
+    Output --> Done([Slide delivered])
+
+    subgraph Legend
+        DoFNote["DoF = Degrees of Freedom"]
+    end
+
+    classDef smartPick fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef smartGen  fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef clarify   fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    class SmartPick smartPick
+    class SmartGen smartGen
+    class ClarifyPick,ClarifyGen clarify
+```
+
+## 3. Sync — source of truth changed
+
+The company updates their source. The agent re-snapshots and reconciles, never destroying without consent (principle 8).
+
+Sync is user-invoked via `/dsk:sync`. The agent does not auto-sync or watch the filesystem. It checks source mtime when invoked for any DSK action; if the source has changed since the last snapshot, it surfaces a polite reminder before proceeding with the requested action.
+
+```mermaid
+flowchart TD
+    SourceChanged([Source of truth updated]) --> Backup["Back up current snapshot/ to snapshot.previous/"]
+    Backup --> ReSnapshot["Snapshot stage: re-run the engine skill for the declared source (e.g. dsk:snapshot-ppt)"]
+    ReSnapshot --> NewSnapshot[New snapshot produced; old preserved as backup]
+    NewSnapshot --> Diff[Diff new vs backup]
+    Diff --> Classify{Change type?}
+    Classify -->|Additive only| AutoApply[Apply silently: new layout or new content type]
+    Classify -->|Destructive or large| AskUser[Stop. Explain change, consequence, ask user]
+    AskUser -->|Confirm| Apply[Apply changes]
+    AskUser -->|Reject| Rollback[Restore backup over new snapshot; pause sync]
+    AutoApply --> RegenArtifacts["Build stage: regenerate library pages"]
+    Apply --> RegenArtifacts
+    RegenArtifacts --> Cleanup[Delete backup]
+    Cleanup --> Done([Synced])
+    Rollback --> Done
+
+    classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef buildStage    fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    class ReSnapshot,NewSnapshot snapshotStage
+    class RegenArtifacts buildStage
+```

@@ -1,0 +1,8 @@
+{
+  "name": "dsk",
+  "description": "Design System Kernel: turns a company's design system source into an AI-readable design system. Generate on-brand slide decks by chatting with the agent in any folder-and-file based AI Design Tool (Claude Design and equivalents). MVP supports PowerPoint; engines for Keynote, Google Slides, Figma, and design tokens are pluggable.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Dawid Dahl"
+  }
+}
