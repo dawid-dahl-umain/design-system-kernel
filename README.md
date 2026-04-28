@@ -48,7 +48,7 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 ## Quickstart
 
 1. Install the plugin (see above).
-2. Open a project folder and drop your company's PowerPoint master into `source/`.
+2. Open a project folder and drop your company's declared source file into `source/` (for MVP, a PowerPoint master).
 3. Run `/dsk:setup` (or say "set up DSK"). The agent walks you through the rest.
 
 For the full skill list, system dependencies, and the developer-testing flow, see [`dsk/README.md`](dsk/README.md).
