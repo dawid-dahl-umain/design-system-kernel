@@ -5,7 +5,7 @@ High-level diagrams of the three core DSK lifecycles. Each is an agentic flow; d
 The DSK pipeline has two named stages that show up in setup and sync:
 
 - **Snapshot stage**: an engine skill (`dsk:snapshot-<format>`, e.g. `dsk:snapshot-ppt` for PowerPoint) reads the source of truth and writes the `DesignSystemSnapshot` (slide-specific data plus PNG screenshots). Each source format has its own engine skill; the manifest's `engine` field selects which one.
-- **Build stage**: the agent reads the snapshot and the kernel briefs and produces the library pages as web pages (HTML, CSS, JavaScript). Visual output, in a different medium than the declared source.
+- **Build stage**: the agent reads the snapshot and the kernel briefs and produces two artifact categories — **renditions** (web-rendered versions of every layout and example, the actual slides compose reuses) and **library pages** (the browser around them). Visual output, in a different medium than the declared source. Renditions may pause to ask the user for design-system direction; library page chrome does not.
 
 ## 0. Overview — the whole lifecycle end to end
 
@@ -33,7 +33,8 @@ sequenceDiagram
     Note over You,Files: 3. Build a deck (slide by slide, ongoing)
     loop For each slide in the deck
         You->>DSK: "Make a slide for ..."
-        DSK->>Files: Read snapshot, pick layout, generate
+        DSK->>Files: Pick layout from snapshot; open its rendition
+        DSK->>Files: Fill rendition placeholders with content
         DSK->>Files: Write slide to decks/dated-slug/
         DSK-->>You: Slide delivered
     end
@@ -63,13 +64,19 @@ flowchart TD
     WriteAgentsMd --> RunSnapshot["Snapshot stage: run the engine skill for the source format (e.g. dsk:snapshot-ppt for PPT)"]
     RunSnapshot --> SnapshotWritten["Snapshot written: snapshot.json + PNG assets in snapshot/"]
     SnapshotWritten --> Build["Build stage: agent reads the snapshot + the kernel briefs"]
-    Build --> LibraryProduced["Library produced: welcome, layouts, examples, content gallery (all rendered as web pages)"]
+    Build --> CheckDS{"Design system available? (host feature, or user-provided in project)"}
+    CheckDS -->|Yes| Renditions["Generate renditions: one HTML file per layout and example, in library/renditions/"]
+    CheckDS -->|No| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
+    AskUser --> Renditions
+    Renditions --> LibraryProduced["Library produced: renditions + browser pages (welcome, layouts, examples, content gallery)"]
     LibraryProduced --> Ready([Ready: users can chat with the agent])
 
     classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     classDef buildStage    fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef clarify       fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
     class RunSnapshot,SnapshotWritten snapshotStage
-    class Build,LibraryProduced buildStage
+    class Build,Renditions,LibraryProduced buildStage
+    class CheckDS,AskUser clarify
 ```
 
 ## 2. Compose — generating a slide
@@ -93,7 +100,8 @@ flowchart TD
     Annotated --> SmartPick
     SmartPick -.->|No fitting layout or unclear intent| ClarifyPick[Request user clarification]
     ClarifyPick -.-> SmartPick
-    SmartPick --> SmartGen[Smart content generation: fill the layout; applies brand rules and uses metadata when present]
+    SmartPick --> OpenRendition[Open the chosen layout's rendition file from library/renditions/layouts/]
+    OpenRendition --> SmartGen[Smart content generation: fill the rendition's placeholders with content; uses metadata when present]
     SmartGen -.->|Would otherwise have to assume| ClarifyGen[Request user clarification]
     ClarifyGen -.-> SmartGen
     SmartGen --> Decide{"DoF level required? (compared against manifest's silent_up_to and ceiling)"}
@@ -137,7 +145,7 @@ flowchart TD
     Classify -->|Destructive or large| AskUser[Stop. Explain change, consequence, ask user]
     AskUser -->|Confirm| Apply[Apply changes]
     AskUser -->|Reject| Rollback[Restore backup over new snapshot; pause sync]
-    AutoApply --> RegenArtifacts["Build stage: regenerate library pages"]
+    AutoApply --> RegenArtifacts["Build stage: regenerate renditions + library pages"]
     Apply --> RegenArtifacts
     RegenArtifacts --> Cleanup[Delete backup]
     Cleanup --> Done([Synced])
