@@ -14,7 +14,7 @@ A browsable catalog of every layout in the snapshot, shown as web-rendered speci
 - Specimens grouped by inferred family from the layout name where the family is evident (Title, Content, Divider, Closer, etc.). Each group has a clear section header. Within a group, layouts ordered alphabetically by name. The grouping must be deterministic across runs.
 - A way to open each rendition at full size (clickable card linking to the rendition file, or equivalent).
 - A short instruction at the top of the page: how a user picks a layout when chatting with the agent, and how to ask the agent to refine a specific rendition by id (handled by `dsk:refine`).
-- **A "compare to source" affordance for every entry.** Show the source screenshot from `snapshot/assets/layout-screenshots/<id>.png` alongside the rendition (side-by-side by default; toggle is acceptable). Users need to be able to see fidelity gaps at a glance — that's how they spot what to refine.
+- **A "compare to source" affordance for every entry.** Provide a way to surface the source screenshot from `snapshot/assets/layout-screenshots/<id>.png` for comparison, but **keep the source hidden by default — only reveal on explicit user interaction** (a toggle button, click-to-overlay, swap-on-press, or similar; the agent picks the specific pattern). The rendition is the headline; the source is a comparison reference users invoke when they want to spot fidelity gaps. The toggle's visual treatment — button design, transition style, animation timing — should follow the page's overall chrome aesthetic, not introduce its own visual vocabulary.
 
 ## Should consider
 

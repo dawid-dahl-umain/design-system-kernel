@@ -13,7 +13,7 @@ Show a gallery of filled example slides as web-rendered specimens (renditions), 
 - Each example shows a stable id, the layout it uses, and any sub-classification tags discernible from the layout name or notes (theme variant, visual style, fidelity level, content type).
 - Examples grouped by their underlying layout, with deterministic group ordering (alphabetical by layout name). Each group has a clear section header.
 - A short instruction at the top of the page: how a user uses this page when building a deck, and how to refine a specific example rendition by id (handled by `dsk:refine`).
-- **A "compare to source" affordance for every entry.** Show the source screenshot from `snapshot/assets/example-screenshots/<id>.png` alongside the rendition (side-by-side by default; toggle is acceptable). This is the user's main fidelity-check signal.
+- **A "compare to source" affordance for every entry.** Provide a way to surface the source screenshot from `snapshot/assets/example-screenshots/<id>.png` for comparison, but **keep the source hidden by default — only reveal on explicit user interaction** (a toggle button, click-to-overlay, swap-on-press, or similar; the agent picks the specific pattern). The rendition is the headline; the source is the user's fidelity-check reference, available on demand. The toggle's visual treatment — button design, transition style, animation timing — should follow the page's overall chrome aesthetic, not introduce its own visual vocabulary.
 
 ## Should consider
 
