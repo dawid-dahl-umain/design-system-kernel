@@ -15,7 +15,7 @@ This plugin is published from the source repository as a marketplace of one plug
 /plugin install dsk@design-system-kernel
 ```
 
-> If this repo has moved (forked, or relocated to a different owner/org), substitute the current `<owner>/<repo>` in the first command. The marketplace name (`design-system-kernel`) and plugin name (`dsk`) stay the same.
+> **TODO (pre-launch):** the marketplace URL above (`dawid-dahl-umain/design-system-kernel`) is DSK's current development location. At launch this will move to a permanent owner/repo; substitute the new `<owner>/<repo>` portion of the install command then. The marketplace name (`design-system-kernel`) and plugin name (`dsk`) are stable across moves.
 
 For local development without going through the marketplace flow, clone the repo and load this folder directly:
 
