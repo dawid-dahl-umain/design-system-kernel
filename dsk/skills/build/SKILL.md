@@ -60,17 +60,23 @@ Treat each line in the lists as an independent assertion. The page must satisfy 
 
 ### Style stance
 
-Library pages should feel visually at home with the company's design system — sympathetic to the source, not generic documentation chrome. Two rendering paths depending on what the host AI Design Tool offers:
+Library pages should feel visually at home with the design system in the environment where the build is being run. Resolve the rendering aesthetic in this priority order:
 
-1. **If the host exposes a design system feature** (typography tokens, color tokens, component primitives, brand assets — e.g. Claude Design's design-system surface): use those directly. The library pages render in the host's native vocabulary, which is the closest you'll get to brand-faithful chrome.
+1. **Host design system, if present** (most preferred). Before deciding the chrome aesthetic, actively check the runtime environment:
+   - **Obvious case:** the host AI Design Tool exposes a design-system feature directly (typography tokens, color tokens, component primitives, brand assets — e.g. Claude Design's design-system surface). Use it.
+   - **Less obvious case:** the host doesn't expose a design-system feature explicitly, but has discoverable design tokens, theme files, or component libraries elsewhere (project-level config, host-managed folders, environment hints). Spend a brief look — not an exhaustive search — to see if anything's there. If found, use it.
 
-2. **If the host has no such feature** (e.g. running in Claude Code or a similar agent runtime where only filesystem access exists): infer a sympathetic aesthetic from the snapshot screenshots — colors, typography character, density, accent choices that feel of-a-piece with the source. You don't need a pixel-perfect match; the goal is "looks nice and feels related to the brand," not exact mimicry.
+   Library pages then render in the host's native vocabulary, which is the closest you'll get to brand-faithful chrome.
 
-3. **In either case**, the embedded snapshot screenshots are the brand-faithful visual specimens. The surrounding UI supports browsing without trying to compete with them. Restrained chrome, content-led.
+2. **Source-derived aesthetic, if no host design system is found** (second preference; typical when running in Claude Code or a similar runtime with only filesystem access). Infer a sympathetic aesthetic from the snapshot screenshots — colors, typography character, density, accent choices that feel of-a-piece with the source. You don't need a pixel-perfect match; the goal is "looks nice and feels related to the brand," not exact mimicry.
 
-4. **Quality bar — practical floor.** The rendered pages should look nice to the user. Readable typography, sensible spacing, restrained color use, professional polish. If choosing between brand fidelity and polish, choose polish — a tasteful approximation beats a clumsy literal match.
+3. **Generic-but-pleasing fallback, only if the source is unreadable or the screenshots don't yield a coherent palette** (rare; should be the exception, not the rule). Pick tasteful neutral defaults: clean sans-serif typography, restrained spacing, a single restrained accent color, professional polish. The pages still look nice; they just don't claim brand affinity.
 
-5. **Never pause to ask the user** for colors, fonts, or brand specifics during build. If the host has a design system feature, use it; otherwise infer from screenshots. Build runs through end-to-end (per principle 11's spirit and the same pacing principle setup uses).
+**Across all three tiers:**
+
+- **The embedded snapshot screenshots are the brand-faithful visual specimens.** The surrounding UI supports browsing without trying to compete with them. Restrained chrome, content-led.
+- **Quality bar — practical floor.** The rendered pages should look nice to the user. Readable typography, sensible spacing, restrained color use, professional polish. If choosing between brand fidelity and polish, choose polish — a tasteful approximation beats a clumsy literal match.
+- **Never pause to ask the user** for colors, fonts, or brand specifics during build. Resolve the aesthetic via the priority order above and run through end-to-end (per principle 11's spirit and the same pacing principle setup uses).
 
 ## Build all four pages
 
