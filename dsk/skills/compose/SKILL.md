@@ -87,6 +87,13 @@ Then:
 
 Each slide is a separate file inside its deck folder (`slide-01.html`, `slide-02.html`, etc.). Optionally maintain an `index.html` in the deck folder for navigation.
 
+After writing slides, surface them to the user using whatever consumption and export channels your runtime supports:
+
+- **Host-native preview and export if available.** If the host AI Design Tool renders HTML inline and offers export to PPTX, PDF, public URL, Canva, or similar, use those — tell the user which options are on the table and let them pick. The HTML files in `decks/` remain the source of truth; host export is a delivery channel.
+- **Otherwise fall back to filesystem and browser.** Tell the user where the files were written and how to view them (open `slide-01.html` or `index.html` in a browser). They can still hand the deck folder off downstream (zip it, commit it, pipe it to another tool).
+
+Same artifacts in either case; the runtime determines the delivery options, not DSK. Do not hardcode host names or assume specific export targets exist.
+
 ## When the user revises
 
 The user can ask for revisions of any slide in the active deck. Treat each revision as a new compose call against the same deck folder; overwrite the slide file or version it (e.g. `slide-03.v2.html`) as appropriate.

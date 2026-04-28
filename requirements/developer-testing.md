@@ -9,10 +9,12 @@ For fast iteration without spending AI Design Tool tokens. Principle 11 makes th
 - The full snapshot stage: PPT → `snapshot.json` plus `assets/`. Driven by the agent following `dsk:snapshot-ppt/SKILL.md`, using python-pptx and LibreOffice via tool calls.
 - Manifest validation, snapshot validation, snapshot diff. These are the deterministic parts (small scripts).
 
-## What you cannot test here
+## What you cannot fully exercise here
 
-- The Build stage. Library pages (welcome.html etc.) are best exercised in the AI Design Tool, where the rendering and integration are designed to live.
-- `dsk:compose` (slide generation), `dsk:sync` user-facing logic, `dsk:route-extension` prose. Same reason.
+The skills below all *run* in Claude Code; what's missing is the host AI Design Tool's rendering and preview integration, not the file generation itself.
+
+- The Build stage. `library/welcome.html` and the other pages are produced fine in Claude Code — open them in a browser to inspect. What you don't see here is the host AI Design Tool's inline preview and integration with the rest of its surface.
+- `dsk:compose` (slide generation), `dsk:sync` user-facing logic, `dsk:route-extension` prose. Same shape: the artifacts are valid; the host-integrated UX is what's not exercised.
 
 ## At a glance
 

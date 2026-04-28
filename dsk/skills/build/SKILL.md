@@ -62,6 +62,8 @@ Run through each brief in turn. Each page can be a single self-contained HTML fi
 
 ## After building
 
+Surface the entry point (`library/welcome.html`) to the user using whatever consumption channel your runtime supports — host-native preview if the host AI Design Tool renders HTML inline, otherwise instruct the user to open the file in a browser. Same artifacts in either case; the difference is only how the user views them.
+
 Write a marker file at `library/.dsk-managed` with this single line of plain text:
 
 ```
