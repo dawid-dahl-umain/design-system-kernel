@@ -58,6 +58,20 @@ Treat each line in the lists as an independent assertion. The page must satisfy 
 - Embed snapshot screenshots as images in the rendered pages. Reference them via relative paths from `library/`.
 - Layout and example pages should read as slide-browser catalogs: a clean grid of source-ratio slide thumbnails, grouped with headings, similar to the preview strip/grid you see when opening a deck in Keynote or PowerPoint. The screenshot is the visual specimen; surrounding UI supports browsing and identification.
 
+### Style stance
+
+Library pages should feel visually at home with the company's design system — sympathetic to the source, not generic documentation chrome. Two rendering paths depending on what the host AI Design Tool offers:
+
+1. **If the host exposes a design system feature** (typography tokens, color tokens, component primitives, brand assets — e.g. Claude Design's design-system surface): use those directly. The library pages render in the host's native vocabulary, which is the closest you'll get to brand-faithful chrome.
+
+2. **If the host has no such feature** (e.g. running in Claude Code or a similar agent runtime where only filesystem access exists): infer a sympathetic aesthetic from the snapshot screenshots — colors, typography character, density, accent choices that feel of-a-piece with the source. You don't need a pixel-perfect match; the goal is "looks nice and feels related to the brand," not exact mimicry.
+
+3. **In either case**, the embedded snapshot screenshots are the brand-faithful visual specimens. The surrounding UI supports browsing without trying to compete with them. Restrained chrome, content-led.
+
+4. **Quality bar — practical floor.** The rendered pages should look nice to the user. Readable typography, sensible spacing, restrained color use, professional polish. If choosing between brand fidelity and polish, choose polish — a tasteful approximation beats a clumsy literal match.
+
+5. **Never pause to ask the user** for colors, fonts, or brand specifics during build. If the host has a design system feature, use it; otherwise infer from screenshots. Build runs through end-to-end (per principle 11's spirit and the same pacing principle setup uses).
+
 ## Build all four pages
 
 Run through each brief in turn. Each page can be a single self-contained HTML file or share a `library/assets/` directory for common CSS and JS. Either approach is fine.
