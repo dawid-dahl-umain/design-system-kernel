@@ -2,14 +2,32 @@
 
 Two distinct kinds of output, which should not be confused with the DSK system itself.
 
-## 1. DSK outputs: library pages
+## 1. DSK outputs: the library (renditions + browser pages)
 
-Produced by the AI Design Tool (Claude Design or equivalent) in the company zone, following the kernel's briefs. Rendered as web pages (HTML, CSS, JavaScript) for humans to browse. All regenerable from source of truth plus kernel rules.
+Produced by the AI Design Tool (Claude Design or equivalent) in the company zone, following the kernel's briefs. Rendered as web technologies (HTML, CSS, JavaScript). All regenerable from source of truth plus kernel rules.
 
-- Welcome page: what this design system is, how to use it, how to talk to the agent.
-- Layouts page: every layout from the source of truth, rendered as browsable specimens with usage notes.
-- Examples page: layouts filled with representative content, showing what good looks like.
-- Content gallery: the content types the agent is allowed to produce (tables, charts, diagrams, callouts, etc), scoped by the company's degrees of freedom setting.
+The library has **two distinct artifact categories** — they serve different purposes and are governed by different rules in `dsk:build`:
+
+### 1a. Renditions — the value layer
+
+Web-rendered versions of every layout and every example in the snapshot. **One file per layout, one file per example**, in `library/renditions/{layouts,examples}/<id>.html`. Self-contained or sharing `library/assets/`.
+
+These are the actual web slides DSK produces. `dsk:compose` reuses them as starting templates: when the user asks for a slide, compose picks a layout, opens its rendition, fills the placeholders with user content, and saves the result to the deck folder. The same rendition is what the user sees when browsing the layouts page.
+
+Renditions are the value: without them, DSK would be just a screenshot gallery of the source. With them, DSK produces a working web slide system the agent can actually compose with.
+
+When no design system is available in the runtime (no host design system feature like Claude Design's, no user-provided design system in the project folder), `dsk:build` pauses and asks the user how to style the renditions before generating them. This is the one place in build where pausing is correct, because renditions are the product.
+
+### 1b. Library pages — the browser around the renditions
+
+Four web pages humans browse to navigate the design system:
+
+- **Welcome page**: what this design system is, how to use it, how to talk to the agent.
+- **Layouts page**: every layout from the source of truth, embedded via the layout renditions, with usage notes.
+- **Examples page**: example renditions filled with representative content, showing what good looks like.
+- **Content gallery**: the content types the agent is allowed to produce (tables, charts, diagrams, callouts, etc.), scoped by the company's degrees of freedom setting.
+
+Library pages embed the renditions (typically via `<iframe>` to preserve slide-ratio isolation), they don't inline them. Page chrome (nav, headings, accent colors) auto-resolves from the runtime — host design system → source-derived → generic fallback — and never pauses the user.
 
 ## 2. AI Design Tool outputs: user work product
 

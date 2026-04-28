@@ -22,6 +22,7 @@ Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor
 ## What's included
 
 - Nine skills (`dsk:context`, `dsk:help`, `dsk:setup`, `dsk:snapshot-ppt`, `dsk:build`, `dsk:compose`, `dsk:sync`, `dsk:route-extension`, `dsk:dof`)
+- A two-stage pipeline: **snapshot** (extract structured slide data plus screenshots from the source) and **build** (produce the library — both web-rendered slide *renditions* that `dsk:compose` reuses, and *library pages* humans browse). See [outputs.md](requirements/outputs.md).
 - Shared snapshot schema and validator (`dsk/lib/snapshot/`)
 - Vendor-neutral project context via `AGENTS.md` (with a `CLAUDE.md` symlink for Claude tooling)
 - Six independent ownership fingerprints (skill namespace, AGENTS.md DSK section, .gitignore DSK section, manifest schema, snapshot schema, `.dsk-managed` markers)

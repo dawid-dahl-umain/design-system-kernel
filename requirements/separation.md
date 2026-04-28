@@ -18,12 +18,17 @@ snapshot/                         # stage 1 output: structured data + screenshot
   .dsk-managed                    # ownership marker (one-line plain text, written by the engine skill)
   snapshot.json
   assets/
-library/                          # stage 2 output: rendered web pages (regenerable; gitignored)
+library/                          # stage 2 output: web technologies (regenerable; gitignored)
   .dsk-managed                    # ownership marker (one-line plain text, written by dsk:build)
-  welcome.html
+  welcome.html                    # browser pages — humans navigate the design system here
   layouts.html
   examples.html
   content-gallery.html
+  renditions/                     # the value layer — actual web slides reused by dsk:compose
+    layouts/
+      <layout-id>.html            # one file per layout in the snapshot
+    examples/
+      <example-id>.html           # one file per example in the snapshot
   assets/                         # shared CSS, JS, images
 decks/                            # finished decks; one folder per deck, date-prefixed (user work product; tracked)
   2026-04-25-q3-results/

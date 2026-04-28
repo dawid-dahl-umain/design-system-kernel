@@ -57,7 +57,7 @@ DSK ships as a plugin named `dsk`. Skills inside it are referenced as `dsk:<name
 | `dsk:help` | Diagnostic by project state. Inspects the company zone, reports what is set up vs missing, recommends the next action (setup, sync, etc.). User-invocable. | `inspect_state.py` |
 | `dsk:setup` | First-time install. Add source, write manifest, write or extend the project `AGENTS.md` marker (with `CLAUDE.md` symlink for Claude tooling), write/extend `.gitignore`, run snapshot, run build. | — |
 | `dsk:snapshot-ppt` | Stage 1, PowerPoint engine. Agent extracts the snapshot from a PPT source by following SKILL.md, using python-pptx and LibreOffice via tool calls (no monolithic engine script). Other source formats use their own `dsk:snapshot-*` engine skill. Validation is shared across engines (see `lib/snapshot/`). | — |
-| `dsk:build` | Stage 2. Read snapshot plus briefs, produce the library pages. | `briefs/` (welcome, layouts, examples, content-gallery) |
+| `dsk:build` | Stage 2. Read snapshot plus briefs, produce two artifact categories under `library/`: **renditions** (one HTML file per layout and example, the actual web slides reused by compose) and **library pages** (the browser around them — welcome, layouts, examples, content-gallery). May pause for user input if no design system is available for the renditions. | `briefs/` (welcome, layouts, examples, content-gallery) |
 | `dsk:compose` | Usage flow. Smart layout selection plus smart content generation plus DoF decision. | — |
 | `dsk:sync` | Re-snapshot, diff against current, classify changes, apply silently or ask user (principle 8). | — |
 | `dsk:route-extension` | Handle out-of-scope requests by directing the user to update source-of-truth and re-sync. Enforces principle 1. | — |

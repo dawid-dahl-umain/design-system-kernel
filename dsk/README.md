@@ -28,7 +28,7 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 1. Install the plugin (see above).
 2. Open a project folder and drop your company's declared source file into `source/` (for MVP, a PowerPoint master).
 3. Invoke `/dsk:setup` (or say "set up DSK for this company"). The agent walks you through the rest.
-4. Once setup is done, browse the generated `library/` pages and start building decks via chat.
+4. Once setup is done, browse the generated library — `library/welcome.html` is the entry point — and start building decks via chat. Slides are composed by reusing the layout renditions under `library/renditions/`.
 
 ## Skills
 
@@ -36,8 +36,8 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 - `dsk:help` — project state diagnostic and onboarding.
 - `dsk:setup` — first-time install.
 - `dsk:snapshot-ppt` — stage 1: read a PowerPoint source, write snapshot.
-- `dsk:build` — stage 2: read snapshot + briefs, produce library pages.
-- `dsk:compose` — generate a slide.
+- `dsk:build` — stage 2: read snapshot + briefs, produce **renditions** (web-rendered layouts and examples reused by compose) plus the **library pages** that browse them.
+- `dsk:compose` — generate a slide by reusing a layout rendition and filling its placeholders.
 - `dsk:sync` — reconcile after the declared source changes.
 - `dsk:route-extension` — handle out-of-scope requests.
 - `dsk:dof` — degrees of freedom reference (invoked by compose and sync; not user-invocable as a slash command).

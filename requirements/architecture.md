@@ -15,7 +15,7 @@ flowchart TB
         end
 
         subgraph Cz["Company zone — unique per company"]
-            CStuff["Source of truth · Manifest · Snapshot · Library pages · Finished decks"]
+            CStuff["Source of truth · Manifest · Snapshot · Library (renditions + browser pages) · Finished decks"]
         end
     end
 
@@ -34,7 +34,7 @@ flowchart TB
 
 - **AI Design Tool.** The host DSK plugs into. Claude Design today; any folder-and-file based agentic environment in principle.
 - **Kernel zone (DSK).** The portable, company-agnostic files DSK ships with: skills, briefs, snapshot engines, vocabularies. Identical across every install. This is "DSK itself."
-- **Company zone.** Per-company files: source of truth (PPT primary), manifest, snapshot plus assets, library pages, finished decks.
+- **Company zone.** Per-company files: source of truth (PPT primary), manifest, snapshot plus assets, library (renditions and the browser pages around them — see [outputs.md](outputs.md)), finished decks.
 - **Agent.** The runtime. Reads from the kernel zone for behavior rules, reads and writes the company zone for company-specific content.
 - **Upstream AI process (optional).** An external system the company may have, such as a knowledge base or content generator. Produces annotated content that the user can submit. DSK consumes the metadata when present. See [content-input.md](content-input.md).
 - **User.** Chats with the agent, receives library pages and finished decks.
