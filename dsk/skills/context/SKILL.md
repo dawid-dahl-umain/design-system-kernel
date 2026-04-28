@@ -34,7 +34,7 @@ Two named stages:
 - **Snapshot stage**: extract a `DesignSystemSnapshot` from the source (slide-specific data plus PNG screenshots). Each source format has its own engine skill: MVP ships `dsk:snapshot-ppt` for PowerPoint. The "engine" is you using the appropriate tools (e.g. python-pptx and LibreOffice for PPT) via tool calls; there is no monolithic engine script. Future engines (`dsk:snapshot-keynote`, `dsk:snapshot-figma`, etc.) are skills that slot in alongside.
 - **Build stage**: read the snapshot plus the kernel briefs and produce two artifact categories — **renditions** (web-rendered layouts, examples, and content items, the actual web slides DSK delivers) and **library pages** (the browser around them). Skill: `dsk:build`.
 
-## Rendition file lifecycle
+## Rendition read/write rules
 
 Renditions (`library/renditions/{layouts,examples,content}/<id>.html`) are the value layer DSK produces. Every skill has well-defined read/write semantics on them; mixing these up silently corrupts the design system, so be precise.
 
