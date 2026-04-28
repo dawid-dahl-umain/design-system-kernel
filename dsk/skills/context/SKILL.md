@@ -32,7 +32,20 @@ The mental model is: Claude Design becomes the slide authoring surface, but the 
 Two named stages:
 
 - **Snapshot stage**: extract a `DesignSystemSnapshot` from the source (slide-specific data plus PNG screenshots). Each source format has its own engine skill: MVP ships `dsk:snapshot-ppt` for PowerPoint. The "engine" is you using the appropriate tools (e.g. python-pptx and LibreOffice for PPT) via tool calls; there is no monolithic engine script. Future engines (`dsk:snapshot-keynote`, `dsk:snapshot-figma`, etc.) are skills that slot in alongside.
-- **Build stage**: read the snapshot plus the kernel briefs and produce the library pages (welcome, layouts, examples, content gallery). Skill: `dsk:build`.
+- **Build stage**: read the snapshot plus the kernel briefs and produce two artifact categories — **renditions** (web-rendered layouts, examples, and content items, the actual web slides DSK delivers) and **library pages** (the browser around them). Skill: `dsk:build`.
+
+## Rendition file lifecycle
+
+Renditions (`library/renditions/{layouts,examples,content}/<id>.html`) are the value layer DSK produces. Every skill has well-defined read/write semantics on them; mixing these up silently corrupts the design system, so be precise.
+
+| Skill | Reads | Writes | Modifies existing renditions? |
+|---|---|---|---|
+| `dsk:build` | snapshot, briefs | renditions + library pages | **Creates** them (overwrites on rebuild) |
+| `dsk:compose` | rendition (as template) | new file in `decks/<...>/slide-XX.html` | **No — read-only**. Compose fills placeholders **in memory** and writes a NEW slide file to the deck folder. The rendition stays untouched and is reused by every subsequent slide using that layout. |
+| `dsk:refine` | rendition + source screenshot | the same rendition file | **Yes — sole modifier**. Only touches a rendition when the user explicitly asks for a refinement on that specific id. |
+| `dsk:sync` | new snapshot, old snapshot backup | renditions + library pages | **Regenerates** them when the source has changed. |
+
+The single most important rule: **`dsk:compose` never writes back to a rendition file.** A slide is always a new file under `decks/`, never a modification of the rendition. This is what keeps the design system stable across slides — every slide using the same layout starts from the same trusted template.
 
 User-facing skills layer on top:
 
