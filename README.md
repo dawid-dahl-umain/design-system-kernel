@@ -4,7 +4,7 @@
 
 # Design System Kernel (DSK)
 
-A Claude Code plugin that turns a company's PowerPoint master into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat. Used today through Claude Design; lets employees build decks by chatting with the agent instead of composing them manually in PowerPoint or Keynote.
+A Claude Code plugin that turns a company's declared design system source into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat. Used today through Claude Design; lets employees build decks by chatting with the agent instead of composing them manually in PowerPoint or Keynote.
 
 Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor-neutral and engine-pluggable, so additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts can be added in the future. Those are part of the design intent, not currently implemented.
 
