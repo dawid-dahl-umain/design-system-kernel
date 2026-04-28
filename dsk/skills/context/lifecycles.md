@@ -33,8 +33,8 @@ sequenceDiagram
     Note over You,Files: 3. Build a deck (slide by slide, ongoing)
     loop For each slide in the deck
         You->>DSK: "Make a slide for ..."
-        DSK->>Files: Pick layout from snapshot, open its rendition
-        DSK->>Files: Fill rendition placeholders with content
+        DSK->>Files: Pick layout from snapshot, read its rendition
+        DSK->>Files: Fill placeholders into a new slide file (rendition stays read-only)
         DSK->>Files: Write slide to decks/dated-slug/
         DSK-->>You: Slide delivered
     end

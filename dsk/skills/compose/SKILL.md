@@ -10,7 +10,9 @@ Generate a slide for the user, using the snapshot, the briefs, the manifest, and
 
 ## Authoring model
 
-The user is using the AI Design Tool instead of PowerPoint or Keynote, but they should get the same confidence that official layouts remain official layouts. Treat the layout renditions in `library/renditions/layouts/` as the trusted starting templates — they were generated at build time per the company's design system and are the same layouts the library pages display. Your job is to pick the right rendition, fill its placeholders with the user's content, and save the result to the deck folder. You do not re-render layouts from scratch; build already did that work.
+The user is using the AI Design Tool instead of PowerPoint or Keynote, but they should get the same confidence that official layouts remain official layouts. Treat the layout renditions in `library/renditions/layouts/` as the trusted starting templates — they were generated at build time per the company's design system and are the same layouts the library pages display. Your job is to pick the right rendition, **read** its content, fill its placeholders with the user's content in memory, and **write a new file** to the deck folder containing the populated slide. You do not re-render layouts from scratch; build already did that work.
+
+**Critical: compose never writes back to the rendition file.** Renditions in `library/renditions/` are read-only inputs to compose. The deck folder gets a new file per slide; the rendition stays untouched and gets reused by every subsequent slide using that layout. The only skill that modifies rendition files is `dsk:refine`, and only when the user explicitly requests it for a specific rendition.
 
 Your added value is that the user can chat instead of manually composing, and that slides can change more fluidly within the company's configured DoF. Match first. Adapt when the content needs it. Stretch only with confirmation when the manifest requires it. Do not silently turn an official layout into a different composition.
 

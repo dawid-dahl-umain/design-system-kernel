@@ -65,6 +65,8 @@ Treat each line in the lists as an independent assertion. The page must satisfy 
 
 Renditions are web-rendered versions of every layout and every example in the snapshot, produced once at build time and reused by compose. They are what makes DSK useful: the user gets actual web slides, not just a screenshot gallery of the source.
 
+**Rendition file lifecycle:** `dsk:build` writes them; `dsk:compose` reads them (never modifies them — slides are written to the deck folder as new files); `dsk:refine` is the only skill that modifies a rendition file, and only on explicit user request; `dsk:sync` regenerates them when the source changes.
+
 ### Modular reuse principle
 
 - **One file per layout** at `library/renditions/layouts/<layout-id>.html`.
