@@ -4,6 +4,8 @@ description: Reconcile DSK after the declared source has changed. Use for /dsk:s
 
 # DSK Sync — Reconcile After Source Changes
 
+**First:** if this is your first DSK action in this chat session, invoke `dsk:context` to load principles and lifecycle context before continuing.
+
 Run when the declared source has been updated and the snapshot is stale.
 
 ## When to invoke

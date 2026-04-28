@@ -4,6 +4,8 @@ description: Stage 2 of the DSK pipeline. Read the snapshot plus the kernel brie
 
 # DSK Build — Stage 2
 
+**First:** if this is your first DSK action in this chat session, invoke `dsk:context` to load principles and lifecycle context before continuing.
+
 Read the snapshot and the kernel briefs, then produce the library pages as web pages (HTML, CSS, JavaScript). This is agentic and behavior-level: the briefs describe what each page must convey; you decide how to render.
 
 ## Inputs

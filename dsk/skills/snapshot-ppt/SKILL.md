@@ -5,6 +5,8 @@ allowed-tools: Bash(python3 *) Bash(pip *) Bash(libreoffice *)
 
 # DSK Snapshot (PowerPoint) — Stage 1
 
+**First:** if this is your first DSK action in this chat session, invoke `dsk:context` to load principles and lifecycle context before continuing.
+
 Extract a `DesignSystemSnapshot` from the source PPT. The "engine" is you, the agent, using your tools — there is no monolithic engine script. This is the PowerPoint engine; other source formats use their own `dsk:snapshot-<format>` engine skill.
 
 ## Output you produce

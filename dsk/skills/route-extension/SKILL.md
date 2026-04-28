@@ -4,6 +4,8 @@ description: Handle requests that require extending the design system itself (ne
 
 # DSK Route Extension
 
+**First:** if this is your first DSK action in this chat session, invoke `dsk:context` to load principles and lifecycle context before continuing.
+
 When a user request would require extending the design system itself (a new layout, a new content type, a new brand element not in the snapshot), do not invent it inside the company zone. The source of truth is authoritative and the only origin (principle 1).
 
 ## When this skill applies

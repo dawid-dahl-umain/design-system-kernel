@@ -15,6 +15,8 @@ Orchestrate the first-time installation of DSK for a company project.
 
 1. **Detect existing state and fork behavior.** Before writing anything, inspect the project to see whether DSK is already set up. The cheapest way is to invoke `dsk:help` (which runs `inspect_state.py`) or read the key indicators directly: `manifest.yaml`, `AGENTS.md` DSK section, `snapshot/snapshot.json` validity, `library/` completeness.
 
+   **For non-empty branches (anything other than "no DSK artifacts"), invoke `dsk:context` first before deciding what to do.** At that point the project is already a DSK project, and dsk:context's principles and lifecycle summaries inform every state-recovery decision in this step. The "no DSK artifacts" branch can skip dsk:context — there's nothing to load yet, and setup's own SKILL.md carries enough context for the bootstrap.
+
    **UX principle for every prompt in this step.** When asking the user about state, never expose internal step numbers, skill names, or DSK vocabulary (`snapshot`, `library`, `DoF`, `manifest`). Describe in plain English what happened and what the choices mean. Most users running setup are non-technical (a marketing manager at the company, not a developer). The agent translates between user intent and the underlying invocations.
 
    Then route based on state:

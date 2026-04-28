@@ -4,6 +4,8 @@ description: Generate a slide. Use when the user asks for a slide, says "make me
 
 # DSK Compose — Generate a Slide
 
+**First:** if this is your first DSK action in this chat session, invoke `dsk:context` to load principles and lifecycle context before continuing.
+
 Generate a slide for the user, using the snapshot, the briefs, the manifest, and any metadata that arrives with the content. The typical use case is building out a multi-slide deck one slide at a time.
 
 ## Authoring model
