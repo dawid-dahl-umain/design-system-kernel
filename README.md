@@ -14,16 +14,14 @@ Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor
 - **[`REQUIREMENTS.md`](REQUIREMENTS.md)** — top-level table of contents for the design.
 - **`requirements/`** — design documents (principles, architecture, types, content input, separation, snapshotting, degrees of freedom, glossary, developer testing, open questions). For DSK maintainers and contributors. The plugin runtime does not depend on these files; they describe the system from outside.
 
-## Status
-
-MVP. The plugin is structurally complete and self-contained:
+## What's included
 
 - Nine skills (`dsk:context`, `dsk:help`, `dsk:setup`, `dsk:snapshot-ppt`, `dsk:build`, `dsk:compose`, `dsk:sync`, `dsk:route-extension`, `dsk:dof`)
 - Shared snapshot schema and validator (`dsk/lib/snapshot/`)
 - Vendor-neutral project context via `AGENTS.md` (with a `CLAUDE.md` symlink for Claude tooling)
 - Six independent ownership fingerprints (skill namespace, AGENTS.md DSK section, .gitignore DSK section, manifest schema, snapshot schema, `.dsk-managed` markers)
 
-End-to-end testing against a real PowerPoint master is the next milestone. The snapshot stage is host-portable (principle 11) and can be exercised in Claude Code or any skill-compatible runtime; see [`requirements/developer-testing.md`](requirements/developer-testing.md).
+The snapshot stage is host-portable (principle 11) and can be exercised in Claude Code or any skill-compatible runtime; see [`requirements/developer-testing.md`](requirements/developer-testing.md).
 
 ## Install
 
