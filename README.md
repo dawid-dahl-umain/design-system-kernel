@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/dsk-logo.png" alt="Design System Kernel" width="320" />
+</p>
+
 # Design System Kernel (DSK)
 
 A Claude Code plugin that turns a company's PowerPoint master into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat. Used today through Claude Design; lets employees build decks by chatting with the agent instead of composing them manually in PowerPoint or Keynote.
