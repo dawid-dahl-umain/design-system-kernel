@@ -13,6 +13,8 @@ Orchestrate the first-time installation of DSK for a company project.
 
 ## Flow
 
+**Pacing principle (applies across the whole flow).** Setup is a one-shot bootstrap — the user invoked it once expecting a working DSK install at the end. Run end-to-end by default. Narrate in plain English what's about to happen before each long-running or non-trivial transition (snapshot, build), so the user sees the flow without being gated. Don't ask for confirmation between steps. Pause only for: (a) genuinely heavy actions like large dependency installs (e.g. LibreOffice ~800MB), (b) destructive overwrites that risk user data, (c) errors that need user input to resolve. Keep narration tight — one sentence per transition. This keeps setup fast for the happy path while still asking for consent on the moments that matter.
+
 1. **Detect existing state and fork behavior.** Before writing anything, inspect the project to see whether DSK is already set up. The cheapest way is to invoke `dsk:help` (which runs `inspect_state.py`) or read the key indicators directly: `manifest.yaml`, `AGENTS.md` DSK section, `snapshot/snapshot.json` validity, `library/` completeness.
 
    **For non-empty branches (anything other than "no DSK artifacts"), invoke `dsk:context` first before deciding what to do.** At that point the project is already a DSK project, and dsk:context's principles and lifecycle summaries inform every state-recovery decision in this step. The "no DSK artifacts" branch can skip dsk:context — there's nothing to load yet, and setup's own SKILL.md carries enough context for the bootstrap.
@@ -141,9 +143,17 @@ Orchestrate the first-time installation of DSK for a company project.
 
    Rationale: `source/`, `manifest.yaml`, `AGENTS.md`, the `CLAUDE.md` symlink, and `decks/` represent user-owned content (input, config, project marker, work product) and should be tracked. `snapshot/` and `library/` are build artifacts. `snapshot.previous/` is a transient backup `dsk:sync` creates and removes; it should never be committed.
 
-8. **Run the snapshot stage** by invoking the snapshot engine skill for the declared source (`dsk:snapshot-ppt` for a PowerPoint source; future engines for other formats). This produces `snapshot/snapshot.json` plus PNG assets in the company zone. Once this stage validates successfully, the core setup files may stay in place even if the later build stage needs a retry.
+8. **Run the snapshot stage** by invoking the snapshot engine skill for the declared source (`dsk:snapshot-ppt` for a PowerPoint source; future engines for other formats).
 
-9. **Run the build stage** by invoking `dsk:build`. This produces `library/welcome.html`, `library/layouts.html`, `library/examples.html`, `library/content-gallery.html`.
+   Before invoking, narrate in plain English what's about to happen. Suggested phrasing: "Reading your source file now to capture the slide system — layouts, example slides, and content types. This usually takes 30–60 seconds for a typical PowerPoint master, longer for very large files." Then run the engine skill without further pausing (unless that skill itself pauses for heavy installs like LibreOffice — that's the right place for that pause, not here).
+
+   This produces `snapshot/snapshot.json` plus PNG assets in the company zone. Once this stage validates successfully, the core setup files may stay in place even if the later build stage needs a retry.
+
+9. **Run the build stage** by invoking `dsk:build`.
+
+   Before invoking, narrate. Suggested phrasing: "Source captured. Now generating the reference library pages — browsable HTML pages that document your design system. About 10–30 seconds." Then run the build skill straight through.
+
+   This produces `library/welcome.html`, `library/layouts.html`, `library/examples.html`, `library/content-gallery.html`.
 
 10. **Confirm completion to the user.** Point them at `library/welcome.html` as the entry point, using whatever consumption channel your runtime supports — host-native preview if the host AI Design Tool renders HTML inline, otherwise instruct them to open the file in a browser. Then suggest they start building decks via chat.
 
