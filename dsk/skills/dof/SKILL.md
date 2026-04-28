@@ -1,5 +1,5 @@
 ---
-description: Reference for degrees of freedom (DoF) — the match / adapt / stretch / deviate ladder, vocabulary, worked examples, and runtime actions. Invoke this from `dsk:compose` and `dsk:sync` whenever you need to classify a proposed change against the company's DoF ceiling and silent threshold.
+description: Reference for degrees of freedom (DoF) — the match / adapt / stretch / deviate ladder, vocabulary, worked examples, and runtime actions. Invoke this from `dsk:compose`, `dsk:sync`, and `dsk:refine` whenever you need to classify a proposed change against the company's DoF ceiling and silent threshold.
 user-invocable: false
 ---
 

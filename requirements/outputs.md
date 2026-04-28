@@ -10,11 +10,11 @@ The library has **two distinct artifact categories** — they serve different pu
 
 ### 1a. Renditions — the value layer
 
-Web-rendered versions of every layout and every example in the snapshot. **One file per layout, one file per example**, in `library/renditions/{layouts,examples}/<id>.html`. Self-contained or sharing `library/assets/`.
+Web-rendered versions of every layout, every example, and every content item in the snapshot. **One file per layout, one file per example, one file per content type**, in `library/renditions/{layouts,examples,content}/<id>.html`. Self-contained or sharing `library/assets/`.
 
-These are the actual web slides DSK produces. `dsk:compose` reuses them as starting templates: when the user asks for a slide, compose picks a layout, opens its rendition, fills the placeholders with user content, and saves the result to the deck folder. The same rendition is what the user sees when browsing the layouts page.
+These are the actual web slides DSK produces. `dsk:compose` reuses them as starting templates: layout renditions become the starting frame for a slide; content renditions fill the slide's content slots (a chart, a table, a diagram). The same renditions are what the user sees when browsing the library pages.
 
-Renditions are the value: without them, DSK would be just a screenshot gallery of the source. With them, DSK produces a working web slide system the agent can actually compose with.
+Renditions are the value: without them, DSK would be just a screenshot gallery of the source. With them, DSK produces a working web slide system the agent can actually compose with — and refine, via `dsk:refine`, when a specific rendition drifts from source intent.
 
 When no design system is available in the runtime (no host design system feature like Claude Design's, no user-provided design system in the project folder), `dsk:build` pauses and asks the user how to style the renditions before generating them. This is the one place in build where pausing is correct, because renditions are the product.
 

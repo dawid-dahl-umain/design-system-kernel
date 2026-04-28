@@ -38,6 +38,7 @@ User-facing skills layer on top:
 
 - `dsk:setup` orchestrates first-time install.
 - `dsk:compose` generates slides.
+- `dsk:refine` adjusts a specific rendition (layout, example, or content item) based on user feedback. Useful when a rendition drifts from source — common for content items like charts, tables, diagrams.
 - `dsk:sync` reconciles after source changes.
 - `dsk:route-extension` handles out-of-scope requests.
 - `dsk:help` diagnoses state and onboards new users.

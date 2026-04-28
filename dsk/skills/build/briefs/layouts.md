@@ -13,12 +13,13 @@ A browsable catalog of every layout in the snapshot, shown as web-rendered speci
 - Each specimen shows usage notes derived from the layout's `notes` field plus inferred guidance from placeholder types.
 - Specimens grouped by inferred family from the layout name where the family is evident (Title, Content, Divider, Closer, etc.). Each group has a clear section header. Within a group, layouts ordered alphabetically by name. The grouping must be deterministic across runs.
 - A way to open each rendition at full size (clickable card linking to the rendition file, or equivalent).
-- A short instruction at the top of the page: how a user picks a layout when chatting with the agent.
+- A short instruction at the top of the page: how a user picks a layout when chatting with the agent, and how to ask the agent to refine a specific rendition by id (handled by `dsk:refine`).
+- **A "compare to source" affordance for every entry.** Show the source screenshot from `snapshot/assets/layout-screenshots/<id>.png` alongside the rendition (side-by-side by default; toggle is acceptable). Users need to be able to see fidelity gaps at a glance — that's how they spot what to refine.
 
 ## Should consider
 
 - Show placeholder types as labels on each specimen so the user can see at a glance "this layout has a title and three columns".
-- A "compare to source" affordance — show the source screenshot from `snapshot/assets/layout-screenshots/<id>.png` alongside the rendition for QA, so the user can verify the rendition matches the source's intent.
+- Make each entry's stable id easy to copy (visible label + click-to-copy affordance), since users will reference it by id when invoking `dsk:refine`.
 - A small summary of total layout count at the top of the page.
 - Navigation links to the other display artifacts (Welcome, Examples, Content gallery).
 - Accessibility: alt text on visuals, semantic HTML, keyboard navigation, sufficient color contrast.

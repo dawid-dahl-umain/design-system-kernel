@@ -57,7 +57,23 @@ If content is missing or unclear ("just make a slide" with no topic), the agent 
 
 The deck accumulates in whatever folder the agent picked at step 3 (DSK default: `decks/<YYYY-MM-DD>-<slug>/`; can be a host-specific location). You're never locked into the first version of any slide.
 
-## 4. Updating after the declared source changes
+## 4. Refining a rendition that needs adjustment
+
+After setup, while browsing the library, you might notice a rendition that doesn't quite match the source — a chart's legend in the wrong position, a table header missing the brand accent, a title's font weight slightly off. Each library entry shows a "compare to source" view next to the rendition so these gaps are easy to spot. You can ask the agent to fix specific renditions in conversation; this is `dsk:refine`.
+
+1. `[You]` In the library, spot a fidelity gap on a specific entry (often a content item — charts, tables, diagrams are the most common refinement targets, since they have many small structural details).
+2. `[You]` Note the entry's id (each entry shows it; usually click-to-copy). Ask the agent: "fix `<id>` — the legend should be inside the chart area, not on the right" (or similar).
+3. `[DSK]` Loads `dsk:refine`. Opens the rendition file plus the source screenshot.
+4. `[DSK]` Runs a **direction check**: is this a fidelity correction (toward source), opt-in web expressivity (allowed by principle 10), or a brand/structural divergence (not allowed — needs source-of-truth update)?
+   - Fidelity correction or web expressivity → continue.
+   - Brand/structural divergence → hand off to `dsk:route-extension`; explain that this kind of change should originate in the source.
+5. `[DSK]` Runs a **DoF magnitude check** (same ladder compose uses): if at or below `silent_up_to`, apply silently; if above but at or below `ceiling`, ask you to confirm; if above `ceiling`, block.
+6. `[DSK]` Applies the change to the rendition file. For **layout** renditions, includes a propagation note: "this will apply to every future slide using this layout." For **content** renditions, lighter note: "future slides using this content type will use the refined version." For **example** renditions, no propagation (examples are QA-only).
+7. `[You]` Refresh the library page; the embedded rendition reflects the change.
+
+This loop is especially useful for content items (charts, tables, diagrams) where the agent's first pass is most likely to miss source-specific details.
+
+## 5. Updating after the declared source changes
 
 1. `[You]` Brand team updates the declared source (for MVP, something like `source/Acme-Master.pptx`).
 2. `[You]` Ask for a slide, or invoke any DSK action.

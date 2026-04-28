@@ -36,6 +36,7 @@ dsk/                              # plugin root
         examples.md
         content-gallery.md
     compose/SKILL.md
+    refine/SKILL.md
     sync/SKILL.md
     route-extension/SKILL.md
     dof/SKILL.md
@@ -59,6 +60,7 @@ DSK ships as a plugin named `dsk`. Skills inside it are referenced as `dsk:<name
 | `dsk:snapshot-ppt` | Stage 1, PowerPoint engine. Agent extracts the snapshot from a PPT source by following SKILL.md, using python-pptx and LibreOffice via tool calls (no monolithic engine script). Other source formats use their own `dsk:snapshot-*` engine skill. Validation is shared across engines (see `lib/snapshot/`). | — |
 | `dsk:build` | Stage 2. Read snapshot plus briefs, produce two artifact categories under `library/`: **renditions** (one HTML file per layout and example, the actual web slides reused by compose) and **library pages** (the browser around them — welcome, layouts, examples, content-gallery). May pause for user input if no design system is available for the renditions. | `briefs/` (welcome, layouts, examples, content-gallery) |
 | `dsk:compose` | Usage flow. Smart layout selection plus smart content generation plus DoF decision. | — |
+| `dsk:refine` | Adjust a specific rendition (layout, example, or content item) based on user feedback. Two-layer test: direction check (fidelity correction or opt-in web expressivity → allowed; brand/structural divergence → blocked) and DoF magnitude check (same ladder compose uses). Especially useful for content items where first-pass renditions tend to drift from source. | — |
 | `dsk:sync` | Re-snapshot, diff against current, classify changes, apply silently or ask user (principle 8). | — |
 | `dsk:route-extension` | Handle out-of-scope requests by directing the user to update source-of-truth and re-sync. Enforces principle 1. | — |
 | `dsk:dof` | Reference skill. DoF vocabulary, worked examples, runtime actions. The agent invokes it from compose and sync when classifying a proposed change. Not user-invocable as a slash command. | — |

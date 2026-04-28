@@ -29,6 +29,8 @@ library/                          # stage 2 output: web technologies (regenerabl
       <layout-id>.html            # one file per layout in the snapshot
     examples/
       <example-id>.html           # one file per example in the snapshot
+    content/
+      <content-id>.html           # one file per content type in the snapshot (charts, tables, diagrams, etc.)
   assets/                         # shared CSS, JS, images
 decks/                            # finished decks; one folder per deck, date-prefixed (user work product; tracked)
   2026-04-25-q3-results/

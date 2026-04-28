@@ -26,13 +26,16 @@ library/
   welcome.html              # browser page: project intro
   layouts.html              # browser page: layout catalog (embeds layout renditions)
   examples.html             # browser page: example gallery (embeds example renditions)
-  content-gallery.html      # browser page: content type catalog
+  content-gallery.html      # browser page: content type catalog (embeds content renditions)
   renditions/
     layouts/
       <layout-id>.html      # one file per layout in the snapshot — reusable by compose
       ...
     examples/
       <example-id>.html     # one file per example in the snapshot
+      ...
+    content/
+      <content-id>.html     # one file per content type in the snapshot — reusable by compose's content slots
       ...
   assets/                   # shared CSS, JS, fonts you generate
 ```
@@ -66,8 +69,9 @@ Renditions are web-rendered versions of every layout and every example in the sn
 
 - **One file per layout** at `library/renditions/layouts/<layout-id>.html`.
 - **One file per example** at `library/renditions/examples/<example-id>.html`.
+- **One file per content type** at `library/renditions/content/<content-id>.html`. These are canonical web renditions of each content type from the snapshot's `content_catalog` (a representative bar chart, a representative table, etc.). Compose reuses them when filling layout content slots.
 - **Each rendition is self-contained or shares `library/assets/`.** Never inline rendition HTML directly into library pages — library pages embed renditions via `<iframe>` (preserves slide-ratio isolation) or include them in slots. This keeps renditions reusable by compose and keeps the browser pages thin.
-- **The `<layout-id>` and `<example-id>` match the ids in `snapshot/snapshot.json`** so compose can resolve them.
+- **The `<layout-id>`, `<example-id>`, and `<content-id>` match the ids in `snapshot/snapshot.json`** so compose and refine can resolve them.
 
 ### Stylistic resolution for renditions (asymmetric with chrome — may pause)
 
