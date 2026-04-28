@@ -1,6 +1,8 @@
 # Design System Kernel (DSK)
 
-A portable plugin that plugs into any folder-based AI Design Tool (Claude Design and equivalents) and turns a company's declared design system source into an AI-readable slide system. Employees generate on-brand slides by chatting with the agent, not by composing manually in PowerPoint or Keynote. MVP ships a PowerPoint snapshot engine; the engine model is pluggable for Keynote, Google Slides, Figma, design tokens, and other future sources.
+A Claude Code plugin that turns a company's PowerPoint master into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat. Used today through Claude Design; lets employees build decks by chatting with the agent instead of composing them manually in PowerPoint or Keynote.
+
+Scope today: PowerPoint as source, Claude Design as host. The kernel is designed vendor-neutral and engine-pluggable, so additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts can be added in the future. Those are part of the design intent, not currently implemented.
 
 ## Repository layout
 
