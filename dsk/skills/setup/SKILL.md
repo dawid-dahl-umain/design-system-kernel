@@ -107,7 +107,7 @@ Orchestrate the first-time installation of DSK for a company project.
    - Source of truth: source/<file>
    - Manifest: manifest.yaml
 
-   **Agent: on any interaction with this project, invoke `dsk:context` first** to load DSK's principles and lifecycle context. After that, route to specific `dsk:*` skills based on intent (`dsk:compose` for slide generation, `dsk:sync` after source updates, `dsk:help` for project status, etc.).
+   **Agent: at the start of each new chat session in this project, invoke `dsk:context` once** to load DSK's principles and lifecycle context. You don't need to re-invoke it on every turn within the same session — once per session is enough; the context persists. After that, route to specific `dsk:*` skills based on intent (`dsk:compose` for slide generation, `dsk:sync` after source updates, `dsk:help` for project status, etc.).
    ```
 
    **Bridge `CLAUDE.md` to `AGENTS.md`.** Claude Code and Claude Design read `CLAUDE.md` by default but follow symlinks transparently. Create a symlink so both filenames point at the same file (zero drift):

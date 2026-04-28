@@ -1,5 +1,5 @@
 ---
-description: Foundational DSK context — principles, lifecycle summaries, pointers to lifecycles.md and walkthrough.md. Invoke this FIRST on any DSK project (detected by manifest.yaml, snapshot/, or DSK markers in AGENTS.md / CLAUDE.md), before routing to any other dsk:* skill. Provides the why and the lay-of-the-land you need to operate correctly.
+description: Foundational DSK context — principles, lifecycle summaries, pointers to lifecycles.md and walkthrough.md. Invoke ONCE at the start of any chat session on a DSK project (detected by manifest.yaml, snapshot/, or DSK markers in AGENTS.md / CLAUDE.md), before routing to any other dsk:* skill. Once loaded for a session, do not re-invoke on subsequent turns — the context persists. Provides the why and the lay-of-the-land you need to operate correctly.
 user-invocable: false
 ---
 
