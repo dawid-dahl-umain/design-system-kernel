@@ -4,9 +4,24 @@ A portable plugin that turns a company's declared design system source into an A
 
 Source repository: <https://github.com/dawid-dahl-umain/design-system-kernel>. The full requirements and design rationale live there in `REQUIREMENTS.md` and the `requirements/` folder.
 
+## Install
+
+This plugin is published from the source repository as a marketplace of one plugin. In Claude Code (and Claude Design when supported), install with:
+
+```
+/plugin marketplace add dawid-dahl-umain/design-system-kernel
+/plugin install dsk@design-system-kernel
+```
+
+For local development without going through the marketplace flow, clone the repo and load this folder directly:
+
+```
+claude --plugin-dir /path/to/design-system-kernel/dsk
+```
+
 ## Quickstart
 
-1. Install this plugin into your AI Design Tool's plugin directory.
+1. Install the plugin (see above).
 2. Open a project folder and drop your company's declared source file into `source/` (for MVP, a PowerPoint master).
 3. Invoke `/dsk:setup` (or say "set up DSK for this company"). The agent walks you through the rest.
 4. Once setup is done, browse the generated `library/` pages and start building decks via chat.

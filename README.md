@@ -19,9 +19,24 @@ MVP. The plugin is structurally complete and self-contained:
 
 End-to-end testing against a real PowerPoint master is the next milestone. The snapshot stage is host-portable (principle 11) and can be exercised in Claude Code or any skill-compatible runtime; see [`requirements/developer-testing.md`](requirements/developer-testing.md).
 
+## Install
+
+The plugin lives at `dsk/` inside this repository, so the repo doubles as a single-plugin **marketplace** (`.claude-plugin/marketplace.json` at the root). In Claude Code (and Claude Design when supported), install with:
+
+```
+/plugin marketplace add dawid-dahl-umain/design-system-kernel
+/plugin install dsk@design-system-kernel
+```
+
+For local development without going through the marketplace flow, clone the repo and load the plugin folder directly:
+
+```
+claude --plugin-dir /path/to/design-system-kernel/dsk
+```
+
 ## Quickstart
 
-1. Install the plugin into your AI Design Tool's plugin directory (or load locally with `claude --plugin-dir <path-to-dsk>`).
+1. Install the plugin (see above).
 2. Open a project folder and drop your company's PowerPoint master into `source/`.
 3. Run `/dsk:setup` (or say "set up DSK"). The agent walks you through the rest.
 

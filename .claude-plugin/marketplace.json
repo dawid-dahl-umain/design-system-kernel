@@ -1,0 +1,13 @@
+{
+  "name": "design-system-kernel",
+  "owner": {
+    "name": "Dawid Dahl"
+  },
+  "plugins": [
+    {
+      "name": "dsk",
+      "source": "./dsk",
+      "description": "Design System Kernel: turns a company's declared design system source into a stable structured snapshot the agent reads to generate on-brand slide decks via chat in any folder-and-file based AI Design Tool. The snapshot is captured once and reused; layouts, examples, and content types stay consistent across sessions and users. MVP supports PowerPoint; engines for Keynote, Google Slides, Figma, and design tokens are pluggable."
+    }
+  ]
+}
