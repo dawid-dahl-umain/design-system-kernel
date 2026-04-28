@@ -59,7 +59,7 @@ The deck accumulates in whatever folder the agent picked at step 3 (DSK default:
 
 ## 4. Refining a rendition that needs adjustment
 
-After setup, while browsing the library, you might notice a rendition that doesn't quite match the source — a chart's legend in the wrong position, a table header missing the brand accent, a title's font weight slightly off. Each library entry shows a "compare to source" view next to the rendition so these gaps are easy to spot. You can ask the agent to fix specific renditions in conversation; this is `dsk:refine`. For the visual flow with the direction × DoF × rendition-type branching, see `lifecycles.md` section 4.
+After setup, while browsing the library, you might notice a rendition that doesn't quite match the source — a chart's legend in the wrong position, a table header missing the brand accent, a title's font weight slightly off. Each library entry has a "compare to source" toggle (hidden by default; reveal it on demand) so you can swap to the source screenshot and spot fidelity gaps. You can ask the agent to fix specific renditions in conversation; this is `dsk:refine`. For the visual flow with the direction × DoF × rendition-type branching, see `lifecycles.md` section 4.
 
 1. `[You]` In the library, spot a fidelity gap on a specific entry (often a content item — charts, tables, diagrams are the most common refinement targets, since they have many small structural details).
 2. `[You]` Note the entry's id (each entry shows it; usually click-to-copy). Ask the agent: "fix `<id>` — the legend should be inside the chart area, not on the right" (or similar).
