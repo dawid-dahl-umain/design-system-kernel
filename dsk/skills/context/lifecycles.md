@@ -156,3 +156,47 @@ flowchart TD
     class ReSnapshot,NewSnapshot snapshotStage
     class RegenArtifacts buildStage
 ```
+
+## 4. Refine — adjusting a specific rendition
+
+User-invoked iteration on a single rendition (layout, example, or content item) without rebuilding the whole library. Triggered when a user spots a fidelity gap between a rendition and its source via the library's "compare to source" view, and asks the agent to fix it. Especially common for content items — charts, tables, diagrams — where first-pass renditions tend to drift from source visually.
+
+Two-layer test before any change is applied. Direction first (is this a correction toward source, opt-in web expressivity, or a brand/structural divergence?), then DoF magnitude (same ladder compose uses). The asymmetry that's specific to refine: the confirmation message at the magnitude stage depends on which kind of rendition is being refined, because layout refinements propagate to all future composes while example refinements don't.
+
+```mermaid
+flowchart TD
+    Start([User asks to refine a rendition by id]) --> Identify[Open the rendition file and the source screenshot]
+    Identify --> Direction{"Layer 1 — Direction check"}
+    Direction -->|"Fidelity correction (toward source)"| DoFCheck{"Layer 2 — DoF magnitude vs manifest's silent_up_to and ceiling"}
+    Direction -->|"Opt-in web expressivity (principle 10)"| DoFCheck
+    Direction -->|"Brand or structural divergence (away from source)"| RouteOut[Hand off to dsk:route-extension: update source-of-truth and re-sync]
+    Direction -.->|Ambiguous| AskClarify[Ask user to clarify direction]
+    AskClarify -.-> Direction
+
+    DoFCheck -->|"At or below silent_up_to"| Apply[Edit rendition file; touch only what user asked about; save]
+    DoFCheck -->|"Above silent_up_to but at or below ceiling"| Confirm{"Confirm with user — prompt depends on rendition type"}
+    DoFCheck -->|"Above ceiling"| RouteOut
+
+    Confirm -->|Layout rendition| ConfirmLayout["Heavy propagation note: 'this applies to every future slide using this layout'"]
+    Confirm -->|Content rendition| ConfirmContent["Light propagation note: 'future slides using this content type will use the refined version'"]
+    Confirm -->|Example rendition| ConfirmExample["No propagation note (examples are QA-only)"]
+
+    ConfirmLayout -->|Confirmed| Apply
+    ConfirmContent -->|Confirmed| Apply
+    ConfirmExample -->|Confirmed| Apply
+    ConfirmLayout -->|Rejected| Done
+    ConfirmContent -->|Rejected| Done
+    ConfirmExample -->|Rejected| Done
+
+    Apply --> Done([Rendition file updated; library pages reflect on next reload])
+    RouteOut --> Done
+
+    classDef direction fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef dof       fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef clarify   fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef block     fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    class Direction direction
+    class DoFCheck dof
+    class AskClarify clarify
+    class RouteOut block
+```
