@@ -8,6 +8,11 @@ A Claude Code plugin that turns a company's PowerPoint master into a stable snap
 
 Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor-neutral and engine-pluggable, so additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts can be added in the future. Those are part of the design intent, not currently implemented.
 
+## See how it works
+
+- **[Lifecycle diagrams](dsk/skills/context/lifecycles.md)** — mermaid flowcharts of setup, compose, and sync (renders inline on GitHub).
+- **[Walkthrough](dsk/skills/context/walkthrough.md)** — step-by-step `[You]` / `[DSK]` scenarios from the user's perspective.
+
 ## Repository layout
 
 - **`dsk/`** — the plugin itself. Install via the marketplace flow (see below), or load directly with `claude --plugin-dir dsk` for development. See [`dsk/README.md`](dsk/README.md) for the skill list.
