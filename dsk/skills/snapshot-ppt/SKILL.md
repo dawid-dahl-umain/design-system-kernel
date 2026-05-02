@@ -110,7 +110,17 @@ Below 100 MB, proceed silently as normal — no pause, no prompt.
 
   1. **Duplicate the source PPTX into a temp working file** with `shutil.copy(source, temp)`. Do not start from `Presentation()` — a fresh document does not carry the source's theme parts, embedded media, or master XML, and master-image inheritance is unreliable in the round-trip.
 
-  2. **Open the temp file with python-pptx and strip every existing slide.** Iterate `prs.slides._sldIdLst` and remove each `<p:sldId>`. Orphan slide parts in the package are fine; LibreOffice only renders what's listed in `_sldIdLst`. The masters, layouts, themes, and embedded media all stay intact.
+  2. **Open the temp file with python-pptx and strip every existing slide.** For each slide id in `prs.slides._sldIdLst`, you must do **both** steps in this order: first drop the relationship to remove the slide part from the zip, then remove the `<p:sldId>` from the id list. Skipping the `drop_rel` step leaves orphan slide parts in the package that cause `UserWarning: Duplicate name: 'ppt/slides/slide1.xml'` on save and break soffice's PNG rendering — verified during testing. Concretely:
+
+     ```python
+     sld_id_lst = prs.slides._sldIdLst
+     for sld_id in list(sld_id_lst):
+         rId = sld_id.attrib['{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id']
+         prs.part.drop_rel(rId)
+         sld_id_lst.remove(sld_id)
+     ```
+
+     The masters, layouts, themes, and embedded media all stay intact through this — `drop_rel` only removes the slide-level parts, not the layout/master/theme parts the slides referenced.
 
   3. **Generate a small grayscale stub PNG once** (e.g. `tmp/gray-stub.png`, 1×1 or larger, RGB around `(200, 200, 200)`). Pillow is already a transitive dependency of python-pptx, so use it; no extra install. This stub will fill picture placeholders so they render visibly.
 
@@ -206,7 +216,9 @@ Engine-agnostic shape: the same `SourceMedia` schema is what every engine emits 
 
 ## What to skip on purpose
 
-Theme colors, fonts, logos, embedded images. These are delegated to the host AI Design Tool's native PPT support, the host's own design-system feature, or runtime reading of the source. The snapshot is intentionally slim and slide-specific. Do not extract what isn't required, and do not invent brand primitives if the host cannot provide them.
+The snapshot's structured JSON is intentionally slim. **Do not** record theme colors, font definitions, color palettes, or reusable component primitives as structured fields in `snapshot.json`. Those belong to the host AI Design Tool's design-system feature, or the agent reads them from the source directly at build time. Do not invent brand primitives if the host cannot provide them.
+
+Note the deliberate split with the **Source media** section above: that section *does* extract embedded image and font binaries from the PPTX zip into `assets/source-media/`. Those are raw files for the build stage to use as a brand-asset fallback, not structured fields in the JSON. Extracting binary asset files: yes. Parsing theme XML to populate JSON fields: no.
 
 ## After extraction
 
