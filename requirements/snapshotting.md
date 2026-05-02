@@ -15,6 +15,10 @@ Every engine, current or future, must emit two complementary outputs for each la
 
 Structure-only or visuals-only output does not conform. Both are mandatory.
 
+### Pre-flight size guard
+
+Every engine must check the source file's size before starting extraction. If the source is **larger than 100 MB**, the engine pauses and surfaces to the user, in plain English: the source's size, the estimated subtotal of embedded media that would be extracted to `source-media/` (computable from the source format's directory listing without actually extracting), a rough estimate of total snapshot size and runtime, and three options — proceed full, proceed but skip source-media (the largest disk cost), or cancel. Below the threshold, extraction proceeds silently as normal. This honours principle 8 (destructive or large changes require explicit consent) for the case of large source files where the user might not realise the disk and time cost they're authorising. The 100 MB threshold is shared across engines so the user experience stays consistent regardless of source format.
+
 ## The DesignSystemSnapshot
 
 The snapshot is the typed output of any engine. One `snapshot.json` holds the structured facts; a sibling `assets/` directory holds binaries referenced by path. For MVP the snapshot is also the compiled design system the agent reads at runtime (if multi-engine support lands later, a small compile step will merge multiple snapshots into one).

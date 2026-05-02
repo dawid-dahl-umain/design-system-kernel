@@ -46,6 +46,28 @@ The formal shape of `snapshot.json` and all sub-types is the Pydantic schema in 
 - **pydantic** (v2) for the validation script's typed schema. Install on first use if missing: `pip install pydantic --quiet`.
 - **LibreOffice headless** for rendering PNGs. Install via the system package manager if missing. Convert with `libreoffice --headless --convert-to png <file.pptx>`.
 
+## Before extraction: large-source guard
+
+Before starting any extraction step, check the source file's size. If it is **larger than 100 MB**, pause and ask the user for explicit consent before proceeding. Most corporate PPT templates are 10-50 MB; above 100 MB is unusual enough that the user might not realise the disk and time cost they are authorising, and principle 8 (destructive or large changes require explicit consent) applies.
+
+When the threshold is exceeded:
+
+1. **Compute the relevant numbers without extracting.** Read the source's stat for the file size. Open the PPTX as a zip and sum the sizes of every entry under `ppt/media/` to get the source-media subtotal. Both are cheap reads; no extraction needed.
+
+2. **Surface this to the user, in plain English.** Suggested phrasing:
+
+   > "Your source file is 320 MB, which is larger than typical (most are under 50 MB). Snapshotting will produce roughly 380-450 MB of files in `snapshot/` and may take 5-10 minutes. About 240 MB of that is embedded brand artwork (logos, photos, decorative shapes) that gets extracted to `snapshot/assets/source-media/` for the build stage to use as a brand-asset fallback when your host AI Design Tool does not expose the company's brand directly. How would you like to proceed?"
+   >
+   > - **Proceed with full extraction** (everything: structured data, screenshots, source media)
+   > - **Proceed but skip source-media** (structured data and screenshots only, ~240 MB smaller and faster; choose this if your host already exposes the company's brand assets, or if you are iterating on layouts and don't need the artwork yet)
+   > - **Cancel**
+
+3. **Wait for an explicit choice. Don't proceed silently.** If the user picks "skip source-media," still extract everything else, but emit `source_media: []` and either skip creating `assets/source-media/` or leave it empty. If the user picks "cancel," stop and don't write anything.
+
+4. **Estimates can be rough.** A factor-of-two error band on size and time estimates is fine; the goal is informed consent, not pinpoint accuracy. Round to the nearest whole MB and the nearest minute.
+
+Below 100 MB, proceed silently as normal — no pause, no prompt.
+
 ## What to extract
 
 ### Canvas dimensions
