@@ -77,15 +77,24 @@ Renditions are web-rendered versions of every layout and every example in the sn
 
 ### Stylistic resolution for renditions (asymmetric with chrome — may pause)
 
-Renditions are the value DSK delivers, so be careful here. Resolve in priority order:
+Renditions are the value DSK delivers, so be careful here. Two distinct categories of input matter:
+
+- **Design tokens**: typography, colors, spacing, component primitives. Drive the overall styling.
+- **Brand assets**: logos, decorative artwork, photographic backgrounds, custom fonts. Drive the layout's visual identity at full fidelity.
+
+Resolve each category through the priority order below. Walk the four levels per asset, not per build: when a rendition needs typography, check level 1 first, fall through to 2, 3, and 4 only as needed; do the same independently for the next asset (a logo, a photographic background, a decorative shape). It's normal for design tokens to resolve at level 1 (host) and a specific logo to resolve at level 3 (source-media) in the same run.
 
 1. **Host design system, if clearly available** (most preferred). Actively check the runtime:
    - The host AI Design Tool exposes a design-system feature directly (typography tokens, color tokens, component primitives, brand assets — e.g. Claude Design's design-system surface). Use it.
    - Or the host has discoverable design tokens / theme files / component libraries elsewhere (project-level config, host-managed folders, environment hints). Spend a brief look. If found, use it.
 
-2. **User-provided design system in the project folder** (second preference). If the user has dropped tokens, a `design-system/` folder, brand guidelines, or anything design-system-shaped into the project, use it.
+2. **User-provided design system in the project folder.** If the user has dropped tokens, a `design-system/` folder, brand guidelines, or anything design-system-shaped into the project, use it.
 
-3. **Neither found → STOP and ask the user.** Don't silently approximate. Surface what was checked and offer concrete paths forward, in plain English. Suggested phrasing:
+3. **Source-extracted media** in `snapshot/assets/source-media/`, listed in `snapshot.json`'s `source_media` array. **Brand assets only at this level** — design tokens (typography, colors, spacing) don't live here, only the actual asset files (logos, decorative artwork, photographic backgrounds, embedded fonts). When neither the host (level 1) nor the user-provided folder (level 2) supplies the specific asset a rendition needs, **use this automatically — do not pause to ask first.** Source-media is part of the snapshot the user already authorized by running `dsk:snapshot-*`; reaching for it requires no additional confirmation. Read each entry's `kind` and `role` (when present) to pick assets with confidence; fall back to inspecting the file directly when `role` is absent. Source-media is host-agnostic by construction: the same files are available in Claude Code, in Claude Design, and in any future folder-based host. This is the fallback that makes DSK self-sufficient when the host has no design-system feature.
+
+   **`source_media` may be empty** (`[]` in the snapshot, with no or empty `assets/source-media/` directory). Some sources genuinely carry no embedded brand artwork; that's a normal case, not a bug. When the array is empty, or when it has entries but none match the asset a rendition specifically needs, treat this level as a no-op for that asset and fall through to level 4. Don't fabricate, don't loop, don't warn the user about an empty source-media — the snapshot is what it is.
+
+4. **Nothing in levels 1–3 covers what's needed → STOP and ask the user.** Reach this only when the asset a rendition genuinely needs is missing from the host, missing from the user-provided folder, *and* missing from source-media. Don't silently approximate, and don't skip ahead to this level when level 3 has what's needed. Surface what was checked and offer concrete paths forward, in plain English. Suggested phrasing:
 
    > "I didn't find a design system to base your renditions on. Renditions are the actual web slides DSK will use to make your decks, so they need styling direction. How would you like to proceed?"
 
@@ -98,12 +107,28 @@ Renditions are the value DSK delivers, so be careful here. Resolve in priority o
 
 This pause is correct and intentional. Renditions warrant it because they're the product; chrome doesn't because chrome is just scaffolding.
 
+**Important:** the four levels above are an asset-resolution priority, not an "all or nothing" gate. Use what you can from higher levels and fill the rest from lower levels; only pause at level 4 when *something specific* a rendition needs is genuinely missing across levels 1–3.
+
 ### Quality bar for renditions
 
 - **Match the source's visual character as closely as the chosen path allows.** Layouts and examples should feel like they belong to the company, not like generic web slides.
-- **Preserve slide aspect ratio.** Each rendition file renders at the source slide ratio (typically 16:9 for modern PPT).
+- **Preserve slide aspect ratio.** Each rendition file renders at the slide ratio derived from `snapshot.json`'s `canvas` (`width / height`). The canvas field is authoritative; do not infer the ratio from screenshot pixel dimensions.
 - **Placeholders are real, named slots.** When compose later fills a layout rendition, it should be obvious from the HTML where the title goes, where the body goes, where the chart goes. Use semantic class names or data attributes that match the snapshot's placeholder types.
 - **Polish over pixel-perfect.** A tasteful approximation beats a clumsy literal match.
+
+### Reading the source screenshots — fidelity caveats
+
+The screenshots in `snapshot/assets/` are the visual ground truth, but they are not infallible. Treat them with appropriate skepticism, especially for layouts whose distinguishing character is image content.
+
+- **Prefer example screenshots over layout screenshots when both exist for the same layout.** For each Layout, look up Examples whose `layout_id` matches it. Example screenshots show the layout populated with real content and render at full fidelity (no empty picture placeholders, no synthetic specimen artifacts). When at least one example exists for a layout, treat the example screenshot(s) as the primary visual reference and the layout screenshot as a supporting reference for empty-state structure. When no example exists, the layout screenshot is the only reference.
+
+- **Watch for impoverished layout screenshots.** The snapshot engine renders specimen slides via LibreOffice headless, which has known fidelity limits on photographic backgrounds, gradient fills, and certain theme effects. Symptoms: empty boxes where the placeholder geometry implies an image should be, missing background photography, decorative elements that the layout's name suggests but the screenshot doesn't show. When you spot this, do not faithfully reproduce the impoverished render — that propagates the fidelity gap into the rendition. Instead:
+  - Lean harder on the host design system for visual primitives (colors, typography, photographic style, decorative motifs).
+  - Cross-reference any example screenshots for the same layout; they often show what the layout actually looks like populated.
+  - Read the layout's `notes` field; the engine may have flagged a known gap there (e.g. "subtle radial gradient not visible in this render; treat as solid cream").
+  - If the layout's name implies imagery the screenshots don't show (e.g. `case-image-light` rendering as a plain cream box), the rendition should still convey that the layout has an image region — render a tasteful placeholder image area, not an empty rectangle.
+
+- **Do not invent decoration the source clearly does not have.** This is the inverse risk. If a layout is genuinely minimal (e.g. a `title-cream` layout is just a cream wash with a title and the company's wordmark), keep the rendition minimal. The skepticism above applies when the screenshot looks impoverished *relative to the source's actual character*, not as license to embellish past what the source shows.
 
 ## Library page chrome — the browser around renditions
 
@@ -120,6 +145,24 @@ Resolve the chrome aesthetic in this priority order:
 3. **Generic-but-pleasing fallback** (rare). Tasteful neutral defaults if source is unreadable or yields no coherent palette.
 
 **Never pause to ask the user about chrome specifics.** Resolve via the priority order and run through. Chrome decisions are reversible and low-stakes; renditions are the moment that warrants user input, not chrome.
+
+### Writing for the user — language UX principle
+
+Library pages have human readers (the company's employees), not just the agent. You reason internally in DSK's vocabulary (DoF, ceiling, silent_up_to, manifest, rendition, placeholder, match/adapt/stretch/deviate, source-of-truth, snapshot, content_catalog). **The user does not.** When you write prose into library pages, translate everything to plain English. The user shouldn't have to learn DSK's classification system to use the project productively.
+
+- **Don't write** "This project's DoF ceiling is `adapt`."
+- **Do write** something like *"Right now this project is set up so the agent can match the source exactly or make small adjustments. Bigger changes need your confirmation; changes that break from the source aren't allowed."*
+- **Don't write** "Items above `silent_up_to` aren't shown."
+- **Do write** *"Some content types from the source aren't shown here because the project's settings don't allow them yet."*
+- **The "match / adapt / stretch / deviate" ladder is internal vocabulary — don't expose those words verbatim.** If you need to describe what kinds of changes are allowed, name them in plain language: "exact use", "small adjustments", "larger creative changes", "changes that break from the source's design."
+- **"Rendition" is OK in moderation** since it shows up in the library navigation as a UX concept. But "the slide", "the chart", "the layout" is often more natural for the specific thing being discussed. Pick what flows best.
+- **"Placeholder" is borderline** — fine in obvious context, but "where the title goes" or "the image slot" is plainer.
+- **Stable ids are OK to surface** — users see them in the library and use them when asking the agent to refine a specific entry. Treat them like filenames: visible labels users can copy.
+- **Don't reference internal field names, file paths, or config files as casual asides** (`dof_level`, `silent_up_to`, `display_name`, `additional_screenshots`, `appears_in`, `manifest.yaml`, `snapshot/`, `library/`, `briefs/`). Translate to plain language ("the project's settings", "what the system has captured from the source"), or omit. **Slash commands are fine when the user actually needs to run one** ("Type `/dsk:setup` to start" is good; "edit `manifest.yaml` and re-sync" is bad — the latter assumes the user knows what `manifest.yaml` is and what re-syncing means). When you do mention a slash command, frame it as a thing the user can do, not as a reference to internal mechanics.
+- **Footers stay light.** A useful footer names the company (read from `manifest.yaml`) and the source file path; that's enough. It does not need to advertise that the page is "regenerable from snapshot/ + briefs" — that's an internal property the user doesn't need to think about.
+- **Library's self-name and branding.** This plugin is **DSK: Slides** (the slides plugin in the Design System Kernel family). When a library page needs to brand itself in navigation, `<title>` tags, headers, or footers, use one of: *"DSK: Slides"*, *"[Company name] Slide Library"*, or *"Slide Library"*. Don't use the unqualified *"DSK Library"* — DSK is now the family name, not this plugin's identity. *"Design System Kernel"* spelled out is fine in a one-line subtitle that explains the family context, but keep the primary brand short and slide-specific.
+
+The same principle applies to every brief's "Must include" and "Should consider" instructions: where a brief tells you to surface a DSK concept on the page, you do, but you do it in plain English in the rendered output, never by typing the internal term verbatim. The brief tells you *what* to convey; the principle here governs *how* to phrase it for human readers.
 
 ### Quality bar for chrome
 

@@ -48,12 +48,56 @@ The formal shape of `snapshot.json` and all sub-types is the Pydantic schema in 
 
 ## What to extract
 
+### Canvas dimensions
+
+- Read slide width and height via python-pptx (`presentation.slide_width`, `presentation.slide_height`, both EMU integers sourced from `presentation.xml`'s `<p:sldSz cx="..." cy="..."/>`).
+- Record at the snapshot's top level: `canvas: { "width": <slide_width>, "height": <slide_height>, "unit": "emu" }`.
+- The build stage uses this to set the slide aspect ratio for HTML rendering. Without it, build has to guess from screenshot pixel dimensions, which is unreliable (LibreOffice's PNG export size is not authoritative). The engine knows these values anyway because it needs them to compute the fractional placeholder positions on `Rect`.
+
 ### Layouts (every layout in the slide master)
 
 - Stable id (slugify the layout name; on collision, append index suffix like `title-slide-2`).
-- Name, placeholder types, and placeholder positions as fractions 0..1 of layout width and height (convert from EMU).
-- A PNG screenshot of the layout. PowerPoint slide layouts cannot be directly rendered by LibreOffice, and empty slides may export without visible placeholder structure. Generate a temporary PPTX containing one specimen slide per layout, using neutral placeholder labels or a lightweight visual overlay so the layout's regions are visible. Do not modify the source PPT and do not use invented customer content. Convert the temporary PPTX to PNGs via LibreOffice, then save each into `assets/layout-screenshots/<id>.png`.
-- Optional `notes` with usage guidance you can infer from the placeholder types and the visual. (Or from the user if so explicitly provided, or if you ask them for help in ambiguous cases.)
+- Name and placeholder positions as fractions 0..1 of layout width and height (convert from EMU using the canvas dimensions above).
+- Placeholder `type` strings. Use lowercase with hyphens for compound terms.
+
+  **Recommended vocabulary** (prefer these when python-pptx's `PP_PLACEHOLDER` enum maps cleanly; coin a new short hyphenated term only when nothing here fits):
+
+  - **Titles:** `title`, `center-title`, `subtitle`
+  - **Text:** `body`, `header`, `footer`
+  - **Specialized content:** `picture`, `chart`, `table`, `diagram`, `media`
+  - **Generic content:** `object` (when the slot is unspecialized; compose decides what to fill it with)
+  - **Page metadata:** `slide-number`, `date`
+
+  The list is recommended, not exhaustive or schema-enforced. Cross-engine: future engines (Keynote, Google Slides, Figma) should reuse these terms wherever the concept maps, and coin new terms only for genuinely engine-specific roles. Consistency within a snapshot matters more than cross-snapshot alignment.
+- A PNG screenshot of the layout, rendered with as much of the layout's actual visual character as the source carries (background fills, decorative shapes, brand marks, image regions, photographic backgrounds). The recipe below preserves master inheritance and avoids the common failure modes (empty picture placeholders, lost master imagery, lost theme decoration). Save each into `assets/layout-screenshots/<id>.png`.
+
+  **Specimen rendering recipe — follow this exactly.** Past runs that improvised this step produced screenshots stripped of the layout's image character (empty cream boxes where photographs should be, missing background photos, vanished decorative imagery). The reason was almost always one of: starting from a fresh `Presentation()` instead of the source; not pre-filling picture placeholders; relying on LibreOffice to inherit master imagery through a clean PPTX round-trip. The recipe below addresses each:
+
+  1. **Duplicate the source PPTX into a temp working file** with `shutil.copy(source, temp)`. Do not start from `Presentation()` — a fresh document does not carry the source's theme parts, embedded media, or master XML, and master-image inheritance is unreliable in the round-trip.
+
+  2. **Open the temp file with python-pptx and strip every existing slide.** Iterate `prs.slides._sldIdLst` and remove each `<p:sldId>`. Orphan slide parts in the package are fine; LibreOffice only renders what's listed in `_sldIdLst`. The masters, layouts, themes, and embedded media all stay intact.
+
+  3. **Generate a small grayscale stub PNG once** (e.g. `tmp/gray-stub.png`, 1×1 or larger, RGB around `(200, 200, 200)`). Pillow is already a transitive dependency of python-pptx, so use it; no extra install. This stub will fill picture placeholders so they render visibly.
+
+  4. **For each `layout` in `prs.slide_layouts`, append a specimen slide** via `prs.slides.add_slide(layout)`. Then, for every placeholder on the new slide, populate it according to its type so it renders something:
+     - **Text-bearing placeholders** (TITLE, CENTER_TITLE, SUBTITLE, BODY, HEADER, FOOTER, SLIDE_NUMBER, DATE): set `.text` to a neutral marker like `[TITLE]`, `[BODY]`, `[FOOTER]`. Skip if `.has_text_frame` is False.
+     - **Picture and object placeholders** (PICTURE, OBJECT, CHART, TABLE, MEDIA, CLIP_ART, DIAGRAM, BITMAP): call `placeholder.insert_picture(gray_stub_png)`. Without this, picture placeholders render as empty space in a fresh slide and the layout's image character is lost.
+     - Track the order of appended slides so you can map output PNGs back to layout ids.
+
+  5. **Save the temp PPTX**, then convert with LibreOffice headless **at 1920×1080**:
+
+     ```bash
+     soffice --headless \
+       --convert-to 'png:impress_png_Export:{"PixelWidth":{"type":"long","value":"1920"},"PixelHeight":{"type":"long","value":"1080"}}' \
+       --outdir <out> <temp.pptx>
+     ```
+
+     LibreOffice writes one PNG per slide, named by index; rename each into `snapshot/assets/layout-screenshots/<layout-id>.png` per the order you appended. The 1920×1080 setting is intentional: LibreOffice's default is 1280×720, which downsamples photographic master content (e.g. brand decorative shapes, background imagery) to the point of visible mush. Full HD roughly doubles the working pixels with manageable file-size growth (solid-fill layouts stay ~15-25 KB; image-heavy layouts land around 1-1.5 MB). Same filter applies to example screenshots and content-screenshots; keep the resolution consistent across all asset folders.
+
+  6. **Spot-check the output before claiming success.** Open at least three layout screenshots covering different visual treatments — one with a solid fill, one with photographic or gradient imagery, one with decorative shapes. If a screenshot is visibly impoverished compared to the source's appearance in a real PowerPoint or Keynote viewer (empty boxes where the source has photos, missing background imagery, missing decorative elements), the recipe failed for that layout. Fix and re-run before reporting success.
+
+  **LibreOffice fidelity ceiling.** Even with the recipe followed correctly, LibreOffice headless has known limits on a small set of effects: complex gradient fills, certain theme-driven font substitutions (the company's brand fonts are usually unavailable), some custom shape effects, and a handful of non-standard embedded media formats. For these residual gaps, capture what you can and note the gap in the layout's `notes` field if it would mislead the build agent (e.g. `notes: "Source has a subtle radial gradient behind the title not visible in this render; treat as solid cream."`). LibreOffice is the cross-platform default; future engines on platforms with native PowerPoint or Keynote available may render at higher fidelity.
+- Optional `notes` with usage guidance. Pull from the layout's speaker-notes part if PPT carries one; otherwise infer from placeholder types and the visual, or ask the user in ambiguous cases.
 
 ### Examples (filled non-empty slides in the master)
 
@@ -88,6 +132,42 @@ If a content type has structurally distinct variations the company uses (e.g. a 
 - SmartArt, custom shapes, non-standard layouts.
 - `source_ref` like `slide-12-shape-3`, PNG of the area in `assets/fallback-screenshots/`, and a `reason` explaining why the engine could not parse it.
 - Degrade, don't skip silently.
+
+### Source media (raw assets extracted from the PPTX)
+
+Every PPTX is a zip; embedded brand artwork (logos, decorative shapes, photographic backgrounds, custom fonts) lives at full source resolution under `ppt/media/`. These assets are valuable for the build stage when the host AI Design Tool does not expose the company's brand primitives directly: they let build use real source artwork rather than working from downsampled screenshots. Hosts that do expose brand primitives can ignore this tier.
+
+**Extract everything in `ppt/media/`** into `snapshot/assets/source-media/`, preserving original filenames (the filename, e.g. `image9.png`, is the relationship target referenced by `r:embed r:id="rIdN"` throughout the source XML; preserving it keeps traceability intact).
+
+**If the source has no embedded media** (no `ppt/media/` directory in the zip, or the directory is empty), this is a normal case: not every PPT carries decorative imagery, brand artwork, or embedded fonts. Do not error, do not warn, do not invent placeholder assets. Set `source_media: []` in the snapshot, and either skip creating `assets/source-media/` or leave it empty. The build stage handles the empty case gracefully (it falls through to asking the user when no level 1–3 source has what a rendition needs).
+
+```python
+import zipfile, shutil
+from pathlib import Path
+SRC = Path("source/Acme-Master.pptx")
+OUT = Path("snapshot/assets/source-media")
+OUT.mkdir(parents=True, exist_ok=True)
+with zipfile.ZipFile(SRC) as z:
+    for name in z.namelist():
+        if name.startswith("ppt/media/") and not name.endswith("/"):
+            target = OUT / Path(name).name
+            with z.open(name) as src, open(target, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+```
+
+For each extracted asset, append an entry to the snapshot's `source_media` array:
+
+- **`id`**: stable id derived from the filename (e.g. `image9` from `image9.png`). Slugify if the source uses unusual characters.
+- **`path`**: relative to `snapshot.json`, e.g. `assets/source-media/image9.png`.
+- **`kind`** (recommended): one of `raster` (PNG, JPEG, GIF, WebP), `vector` (SVG, EMF, WMF), `font` (TTF, OTF, WOFF), `media` (MP3, WAV, MP4, MOV). Determine from extension.
+- **`source_ref`** (recommended): the original path inside the source, e.g. `ppt/media/image9.png`. Preserves traceability to the source format.
+- **`role`** (optional, only when confident): one of `brand-mark`, `decorative`, `photographic`, `icon`, `background`. Determine by inspecting which slides/layouts/masters reference the image's `rId`. A small PNG with transparency referenced from the slide master and positioned near a corner is almost certainly a brand mark; an image referenced via `<p:bg><p:blipFill>` on a layout is a background. **If you cannot classify confidently, omit `role`** rather than guessing — the build agent can re-classify by inspection.
+- **`appears_in`** (optional): list of layout/example/content ids that reference this asset. Useful for the build agent to know "this logo appears in every layout" vs "this image is specific to one example."
+- **`notes`** (optional): anything the build agent should know that isn't captured by the structured fields.
+
+Engine-agnostic shape: the same `SourceMedia` schema is what every engine emits (Keynote will extract from package internals, Figma will fetch image fills via API, Google Slides will resolve API-referenced images). Only the extraction differs.
+
+**File-size note.** Extraction is roughly 1:1 with the source's embedded media. A PPTX with 30 MB of photography produces a ~30 MB `source-media/` folder. The user keeps `source/<file>.pptx` already, so no net duplication on the project's overall disk footprint, but the snapshot itself grows. Future versions may add a manifest opt-out (`extract_source_media: false`) if a project has reason to skip this.
 
 ## What to skip on purpose
 

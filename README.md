@@ -1,12 +1,16 @@
 <p align="center">
-  <img src="assets/dsk-logo.png" alt="Design System Kernel" width="320" />
+  <img src="assets/dsk-slides-logo.png" alt="Design System Kernel" width="320" />
 </p>
 
-# Design System Kernel (DSK)
+# DSK: Slides
 
-A Claude Code plugin that turns a company's declared design system source into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat. Used today through Claude Design; lets employees build decks by chatting with the agent instead of composing them manually in PowerPoint or Keynote.
+The slides plugin in the Design System Kernel (DSK) family.
 
-Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor-neutral and engine-pluggable, so additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts can be added in the future. Those are part of the design intent, not currently implemented.
+DSK is a portable pattern: turn a company's declared source of truth into a stable intermediate snapshot (structured data plus rendered visuals), then have an AI agent generate web-rendered artifacts faithful to that source.
+
+**DSK: Slides** is the slides instantiation of that pattern. The agent reads a company's PowerPoint master and generates on-brand slides via chat in Claude Design (or equivalent AI Design Tool), instead of composing them manually in PowerPoint or Keynote. Future DSK plugins for other artifact families (posters, reports, branded documents, etc.) would follow the same source → snapshot → renditions shape.
+
+Scope today: PowerPoint as source, Claude Design as host. DSK: Slides is designed vendor-neutral and engine-pluggable, so additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts can be added in the future. Those are part of the design intent, not currently implemented.
 
 ## See how it works
 
@@ -22,7 +26,7 @@ Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor
 ## What's included
 
 - Ten skills (`dsk:context`, `dsk:help`, `dsk:setup`, `dsk:snapshot-ppt`, `dsk:build`, `dsk:compose`, `dsk:refine`, `dsk:sync`, `dsk:route-extension`, `dsk:dof`)
-- A two-stage pipeline: **snapshot** (extract structured slide data plus screenshots from the source) and **build** (produce the library — both web-rendered slide *renditions* that `dsk:compose` reuses, and *library pages* humans browse). See [outputs.md](requirements/outputs.md).
+- A two-stage pipeline: **snapshot** (extract structured slide data plus screenshots from the source) and **build** (produce the library — both web-rendered slide _renditions_ that `dsk:compose` reuses, and _library pages_ humans browse). See [outputs.md](requirements/outputs.md).
 - Shared snapshot schema and validator (`dsk/lib/snapshot/`)
 - Vendor-neutral project context via `AGENTS.md` (with a `CLAUDE.md` symlink for Claude tooling)
 - Six independent ownership fingerprints (skill namespace, AGENTS.md DSK section, .gitignore DSK section, manifest schema, snapshot schema, `.dsk-managed` markers)

@@ -1,8 +1,10 @@
-# DSK — Design System Kernel
+# DSK: Slides
 
-A Claude Code plugin that turns a company's declared design system source into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat in Claude Design.
+The slides plugin in the Design System Kernel (DSK) family. Turns a company's declared slide-system source into a stable snapshot — structured data plus rendered screenshots — that the agent reads to generate on-brand slide decks via chat in Claude Design.
 
-Scope today: PowerPoint as source, Claude Design as host. DSK is designed vendor-neutral and engine-pluggable; additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts are possible future extensions, not currently implemented.
+DSK as a pattern (source of truth → snapshot → web renditions) is artifact-family-neutral; DSK: Slides is the slides instantiation. Future plugins for other artifact families (posters, reports, etc.) would share the same shape.
+
+Scope today: PowerPoint as source, Claude Design as host. DSK: Slides is designed vendor-neutral and engine-pluggable; additional source engines (Keynote, Google Slides, Figma, design tokens, etc.) and other folder-based AI Design Tool hosts are possible future extensions, not currently implemented.
 
 Source repository: <https://github.com/dawid-dahl-umain/design-system-kernel>. The full requirements and design rationale live there in `REQUIREMENTS.md` and the `requirements/` folder.
 

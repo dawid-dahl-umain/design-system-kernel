@@ -1,12 +1,12 @@
-# DSK (Design System Kernel) — Requirements
+# DSK: Slides — Requirements
 
 Draft v0. Focused and editable.
 
 ## Purpose
 
-DSK is a portable core that plugs into any folder based AI Design Tool (Claude Design today, others later) and turns a company's declared design system source into an AI readable slide system. Employees generate on-brand slides by chatting with the agent, not by composing manually in PowerPoint or Keynote. MVP uses a PowerPoint snapshot engine; the kernel contract is source-engine neutral.
+DSK is a family of plugins that turn a company's declared source of truth into an AI-readable design system, with stable intermediate snapshots and faithful web-rendered artifacts. **DSK: Slides** is the slides plugin in that family: it plugs into any folder-based AI Design Tool (Claude Design today, others later) and turns a company's declared slide-system source into an AI-readable slide system. Employees generate on-brand slides by chatting with the agent, not by composing manually in PowerPoint or Keynote. MVP uses a PowerPoint snapshot engine; the kernel contract is source-engine neutral. Future DSK plugins for other artifact families (posters, reports, branded documents, etc.) would follow the same source → snapshot → renditions shape, but those are out of scope for this document.
 
-"AI Design Tool" is the generic term used throughout these docs for Claude Design or any equivalent folder-and-file based agentic design environment. DSK is deliberately not coupled to any specific one.
+"AI Design Tool" is the generic term used throughout these docs for Claude Design or any equivalent folder-and-file based agentic design environment. DSK: Slides is deliberately not coupled to any specific one.
 
 ## Contents
 

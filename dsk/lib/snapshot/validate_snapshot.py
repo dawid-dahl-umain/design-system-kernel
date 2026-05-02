@@ -92,6 +92,8 @@ def _collect_and_check_screenshots(snapshot: DesignSystemSnapshot, snapshot_dir:
             paths_to_check.append((f"content_catalog '{content.id}' additional_screenshots[{i}]", additional))
     for fallback in snapshot.fallbacks:
         paths_to_check.append((f"fallback '{fallback.source_ref}' screenshot", fallback.screenshot))
+    for media in snapshot.source_media:
+        paths_to_check.append((f"source_media '{media.id}' path", media.path))
     for label, path in paths_to_check:
         referenced.add(path)
         if not (snapshot_dir / path).exists():
@@ -101,8 +103,14 @@ def _collect_and_check_screenshots(snapshot: DesignSystemSnapshot, snapshot_dir:
 def _check_orphans(assets_dir: Path, snapshot_dir: Path, referenced: set[str], warnings: list[str]) -> None:
     if not assets_dir.exists():
         return
-    for png in assets_dir.rglob("*.png"):
-        relative = png.relative_to(snapshot_dir).as_posix()
+    asset_extensions = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".emf",
+                        ".ttf", ".otf", ".woff", ".woff2", ".mp3", ".wav", ".mp4", ".mov"}
+    for asset in assets_dir.rglob("*"):
+        if not asset.is_file():
+            continue
+        if asset.suffix.lower() not in asset_extensions:
+            continue
+        relative = asset.relative_to(snapshot_dir).as_posix()
         if relative not in referenced:
             warnings.append(f"orphan asset (no snapshot entry references it): {relative}")
 

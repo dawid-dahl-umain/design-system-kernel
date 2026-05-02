@@ -16,8 +16,8 @@ Catalog the content types (tables, charts, diagrams, callouts, etc.) the agent i
 
 ## Should consider
 
-- Note alongside each item the DoF level it represents, when known (e.g. "Match: this is exactly how the source uses it").
-- A short paragraph at the top explaining how DoF affects what's shown on this page.
+- Note alongside each item, in plain language, what kind of liberty the agent takes when producing it (only when known via `dof_level`). Translate the level, don't show the word: `match` → "exact use of the source", `adapt` → "small adjustments allowed", `stretch` → "larger creative changes allowed", `deviate` → don't show (this level should never appear here anyway). Never display the raw `dof_level` value or the word "DoF".
+- A short paragraph at the top explaining, in plain English, why some content types from the source might not appear on this page (the project's settings cap how much the agent can change). Don't use the term "DoF" or "ceiling"; describe the effect, not the mechanism.
 - Make each entry's stable id easy to copy (visible label + click-to-copy affordance), since users will reference it by id when invoking `dsk:refine`.
 - Navigation links to the other display artifacts.
 - Accessibility: alt text on visuals, semantic HTML, keyboard navigation, sufficient color contrast.

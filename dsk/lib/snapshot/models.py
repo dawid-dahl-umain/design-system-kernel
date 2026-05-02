@@ -35,6 +35,21 @@ class Rect(BaseModel):
     h: float = Field(ge=0, le=1)
 
 
+class Canvas(BaseModel):
+    """Source slide dimensions. Drives aspect ratio at HTML render time.
+
+    The engine knows these values during extraction (it must, to compute the
+    fractional positions on Rect). Recording them keeps the build stage from
+    having to infer aspect ratio from screenshot pixel dimensions, which is
+    unreliable. Universal across engines: PPT exposes EMU via presentation.xml,
+    Keynote and Google Slides expose points, Figma exposes pixels.
+    """
+    model_config = ConfigDict(extra="forbid")
+    width: float = Field(gt=0)
+    height: float = Field(gt=0)
+    unit: Literal["emu", "px", "pt"]
+
+
 class Placeholder(BaseModel):
     model_config = ConfigDict(extra="forbid")
     type: str
@@ -76,6 +91,30 @@ class Fallback(BaseModel):
     context: str | None = None
 
 
+class SourceMedia(BaseModel):
+    """A raw asset extracted from the declared source.
+
+    Source media is a fallback layer for the build stage: when the host AI
+    Design Tool does not expose the company's brand assets (logos, decorative
+    artwork, photographic backgrounds), build can read these to produce
+    higher-fidelity renditions than it could from screenshots alone. Hosts that
+    do expose brand assets should ignore this tier.
+
+    Engine-agnostic by design. PPT extracts ppt/media/* from the zip; Keynote
+    extracts package internals; Figma fetches image fills via API; Google
+    Slides resolves API-referenced images. The on-disk shape is uniform: a
+    file path inside the snapshot, optional structured hints.
+    """
+    model_config = ConfigDict(extra="forbid")
+    id: str
+    path: str
+    kind: Literal["raster", "vector", "font", "media"] | None = None
+    role: Literal["brand-mark", "decorative", "photographic", "icon", "background"] | None = None
+    source_ref: str | None = None
+    appears_in: list[str] | None = None
+    notes: str | None = None
+
+
 class SourceMeta(BaseModel):
     model_config = ConfigDict(extra="forbid")
     engine: EngineId
@@ -88,7 +127,9 @@ class DesignSystemSnapshot(BaseModel):
     model_config = ConfigDict(extra="forbid")
     snapshot_version: str
     source: SourceMeta
+    canvas: Canvas
     layouts: list[Layout]
     examples: list[Example]
     content_catalog: list[ContentItem]
     fallbacks: list[Fallback]
+    source_media: list[SourceMedia] = []

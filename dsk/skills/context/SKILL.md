@@ -3,15 +3,17 @@ description: Foundational DSK context — principles, lifecycle summaries, point
 user-invocable: false
 ---
 
-# DSK Context
+# DSK: Slides — Context
 
-You are working on a project that uses DSK (Design System Kernel). This skill is the foundational context the other `dsk:*` skills assume — invoke it before any other DSK skill on the project, read it in full, and only then route to the specific skill the user's intent calls for.
+You are working on a project that uses **DSK: Slides** — the slides plugin in the Design System Kernel (DSK) family. This skill is the foundational context the other `dsk:*` skills assume — invoke it before any other DSK skill on the project, read it in full, and only then route to the specific skill the user's intent calls for.
 
-## What DSK is
+## What this plugin is
 
-DSK is a portable plugin that turns a company's declared design system source into an AI-readable slide system. Employees generate on-brand slides by chatting with you (the agent), instead of composing manually in PowerPoint or Keynote. DSK lives inside an AI Design Tool (Claude Design and equivalents) but stays vendor-neutral. MVP uses PowerPoint through `dsk:snapshot-ppt`; the kernel is designed for multiple source engines.
+DSK is a portable pattern: turn a company's declared source of truth into a stable intermediate snapshot, then have an AI agent generate web-rendered artifacts faithful to that source. **DSK: Slides** is the slides instantiation of that pattern — the agent reads a company's declared slide-system source and generates on-brand slides via chat, instead of having employees compose them manually in PowerPoint or Keynote. Other artifact families (posters, reports, branded documents) would have their own DSK plugins following the same source → snapshot → renditions shape; those are out of scope here.
 
-The mental model is: Claude Design becomes the slide authoring surface, but the company's existing slide system remains the constraint system. In PowerPoint or Keynote, users trust that an official layout looks like the official layout. In DSK, the snapshot gives you that same trusted boundary, then DoF defines how much agentic change is allowed inside it.
+DSK: Slides lives inside an AI Design Tool (Claude Design and equivalents) but stays vendor-neutral. MVP uses PowerPoint through `dsk:snapshot-ppt`; the kernel is designed for multiple source engines.
+
+The mental model is: Claude Design becomes the slide authoring surface, but the company's existing slide system remains the constraint system. In PowerPoint or Keynote, users trust that an official layout looks like the official layout. In DSK: Slides, the snapshot gives you that same trusted boundary, then DoF defines how much agentic change is allowed inside it.
 
 ## Core principles
 

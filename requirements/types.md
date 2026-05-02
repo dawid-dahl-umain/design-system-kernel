@@ -8,7 +8,11 @@ The typed output of any snapshot engine. Lives at `snapshot/snapshot.json` in th
 
 Slim by design: only DSK-essential slide information is in the snapshot. Theme colors, fonts, logos, embedded images, and reusable brand components are delegated to the host AI Design Tool's own design-system feature, native PPT extraction, or direct source-file reading.
 
-**Canonical source**: the Pydantic models in [`dsk/lib/snapshot/models.py`](../dsk/lib/snapshot/models.py). The interfaces `DesignSystemSnapshot`, `SourceMeta`, `Layout`, `Placeholder`, `Rect`, `Example`, `ContentItem`, and `Fallback` are defined there. `models.py` is also what `validate_snapshot.py` (alongside it) enforces, so the type definitions and runtime validation cannot drift apart. The schema and validator live at plugin level (not inside any one engine skill) because they are engine-agnostic; every `dsk:snapshot-*` engine emits the same shape and uses the same validator.
+**Canonical source**: the Pydantic models in [`dsk/lib/snapshot/models.py`](../dsk/lib/snapshot/models.py). The interfaces `DesignSystemSnapshot`, `SourceMeta`, `Canvas`, `Layout`, `Placeholder`, `Rect`, `Example`, `ContentItem`, `Fallback`, and `SourceMedia` are defined there. `models.py` is also what `validate_snapshot.py` (alongside it) enforces, so the type definitions and runtime validation cannot drift apart. The schema and validator live at plugin level (not inside any one engine skill) because they are engine-agnostic; every `dsk:snapshot-*` engine emits the same shape and uses the same validator.
+
+`Canvas` records the source slide dimensions (`width`, `height`, `unit`). It is required at the snapshot's top level and drives aspect-ratio decisions in the build stage. The unit is engine-specific (`emu` for PPT, `pt` for Keynote and Google Slides, `px` for Figma); fractional positions on `Rect` are unit-free, but the canvas tells consumers what those fractions are fractions of.
+
+`SourceMedia` is a list of raw assets extracted from the source (logos, decorative artwork, photographic backgrounds, embedded fonts). Each entry records a stable `id`, the asset's `path` inside the snapshot, and optional structured hints (`kind`, `role`, `source_ref`, `appears_in`, `notes`). Build uses this as a fallback tier when the host AI Design Tool does not expose the company's brand primitives directly; it is host-agnostic by construction (the same files are available in Claude Code, Claude Design, or any future folder-based host). Engine-agnostic too: PPT extracts `ppt/media/*`, Keynote extracts package internals, Figma fetches image fills via API, Google Slides resolves API-referenced images. The on-disk shape is uniform.
 
 JSON example:
 
@@ -20,6 +24,11 @@ JSON example:
     "engine_version": "0.1",
     "file": "source/Acme-Master.pptx",
     "extracted_at": "2026-04-25T10:30:00Z"
+  },
+  "canvas": {
+    "width": 9144000,
+    "height": 5143500,
+    "unit": "emu"
   },
   "layouts": [
     {
@@ -50,7 +59,18 @@ JSON example:
       "notes": "Stacked bars by segment. Y-axis always starts at 0."
     }
   ],
-  "fallbacks": []
+  "fallbacks": [],
+  "source_media": [
+    {
+      "id": "image9",
+      "path": "assets/source-media/image9.png",
+      "kind": "raster",
+      "role": "decorative",
+      "source_ref": "ppt/media/image9.png",
+      "appears_in": ["title-fifth-element", "divider-fifth-element", "title-large-fifth-element"],
+      "notes": "Brand-defining swirling decorative shape; appears across the 'Fifth element' family of layouts."
+    }
+  ]
 }
 ```
 

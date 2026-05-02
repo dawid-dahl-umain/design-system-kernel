@@ -17,8 +17,8 @@ Onboard both the company's employees and the agent reading the system. Two audie
 ## Should consider
 
 - A grid or card layout for the artifact links (more scannable than a bulleted list).
-- A plain-language note on what the agent can and cannot do (translate the DoF ceiling and the source-of-truth-only rule into accessible terms).
-- A note that agentic changes are allowed only within the configured DoF, so users can ask for revisions without losing the source design system's guardrails.
+- A plain-language note on what the agent can and cannot do, translating the project's configured DoF settings and the source-of-truth-only rule into accessible terms. Don't use the words "DoF", "ceiling", or `match`/`adapt`/`stretch`/`deviate` verbatim; describe what they mean ("exact use", "small adjustments", "larger creative changes", "changes that break from the source"). Don't use the word "manifest"; if a setting needs to be referenced, say "the project's settings".
+- A note that the agent can make revisions within the limits the project is configured for, so users can ask for changes without losing the source design system's guardrails. Phrase this in plain English.
 - A callout on the collaboration philosophy: the agent does layout and rendering work; the user brings the angle and judgment.
 - A quick visual or one example slide as eye candy.
 - Accessibility: alt text on any screenshots, semantic HTML, keyboard navigation, sufficient color contrast.

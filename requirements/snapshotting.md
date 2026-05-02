@@ -10,7 +10,7 @@ An engine is a skill (`dsk:snapshot-<format>`) that the agent follows to read so
 
 Every engine, current or future, must emit two complementary outputs for each layout (and each example and each unparseable element):
 
-1. **Structure.** The hard, parsed facts from the source format, stored as structured data (JSON). For PPT that means placeholder types and positions, master metadata, and so on. This is what the agent references precisely.
+1. **Structure.** The hard, parsed facts from the source format, stored as structured data (JSON). For PPT that means slide canvas dimensions, placeholder types and positions, master metadata, and so on. This is what the agent references precisely.
 2. **Visuals.** Rendered images (PNG) of the actual layout, so the agent can see what it looks like, using whatever vision capability the underlying model provides. DSK does not dictate how the agent consumes these; it only guarantees they are present.
 
 Structure-only or visuals-only output does not conform. Both are mandatory.
@@ -41,11 +41,13 @@ Formal shape and JSON example: see [types.md](types.md).
 
 ## PPT Snapshot Engine (`dsk:snapshot-ppt`, MVP)
 
-Extracts what the snapshot requires: layout catalog with placeholder metadata, filled example slides rendered as PNG, and a content catalog of tables, charts, diagrams, and similar elements found in the source.
+Extracts what the snapshot requires: slide canvas dimensions, layout catalog with placeholder metadata, filled example slides rendered as PNG, a content catalog of tables, charts, diagrams, and similar elements, and raw source media (embedded images, decorative artwork, fonts) under `assets/source-media/` for the build stage to use as a brand-asset fallback.
 
-Theme colors, fonts, logos, embedded images, and reusable brand components are deliberately not extracted into `snapshot.json`. Those are handled by the host AI Design Tool's native source-file support, the host's own design-system feature, or by the agent reading the declared source directly at runtime.
+Theme colors, fonts as styling tokens, and reusable brand components remain delegated to the host AI Design Tool's design-system feature or to the agent reading the declared source directly. The snapshot itself stays slim on the structured-data side; only the actual asset binaries are physically copied, because they are the one thing build cannot reconstruct from screenshots when the host has no brand-asset surface.
 
 Elements the engine cannot cleanly parse (SmartArt, custom shapes, non-standard layouts) are rendered as PNG into `assets/fallback-screenshots/` and recorded in the snapshot's `fallbacks` array with a reason. System degrades rather than fails.
+
+Layout screenshots are produced by appending one specimen slide per layout to a copy of the source PPTX (preserving theme, masters, and embedded media), pre-filling picture placeholders with a neutral grayscale stub so they render visibly, and converting via LibreOffice headless. The recipe is specified in `dsk/skills/snapshot-ppt/SKILL.md`. LibreOffice has a known fidelity ceiling on certain effects (complex gradients, custom fonts, some theme decoration); residual gaps are recorded in the affected layout's `notes` field rather than silently absorbed.
 
 ## Implementation: agentic, not scripted
 

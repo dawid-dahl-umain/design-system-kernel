@@ -1,5 +1,5 @@
 ---
-description: Refine a specific rendition (layout, example, or content item) based on user feedback. Use when the user identifies a rendition by id and asks for adjustments — typography tweaks, fidelity corrections, web-medium polish. Especially valuable for content items (diagrams, tables, charts) where source fidelity is critical. Runs a direction check and a DoF magnitude check before applying any change.
+description: Refine a specific rendition (layout, example, or content item) to better match the source or fix issues. Use when the user points at a rendition (by id or by description) and asks for adjustments — typography tweaks, web-medium polish, or any time they say something like "make it match the source", "look at the original again", "this doesn't look like the source", "make it more aligned with the original", or note a visible gap between a rendition and its source screenshot. Especially valuable for content items (bar charts, tables, diagrams, callouts) where first-pass renditions tend to drift on small structural details. Runs a direction check and a DoF magnitude check before applying any change.
 ---
 
 # DSK Refine — Tune a Rendition
@@ -10,9 +10,9 @@ When a user has been browsing the library and notices a rendition that needs adj
 
 ## When to invoke
 
-- User identifies a rendition by id and asks for changes ("make the title bigger in `title-slide-2`", "the bar chart in `bar-chart-stacked-by-year` has the legend in the wrong place").
+- User identifies a rendition (by id or by description) and asks for changes — "make the title bigger in `title-slide-2`", "the bar chart in the gallery has the legend in the wrong place".
 - User has been chatting about a specific rendition and asks for an iteration.
-- User notes a fidelity gap between a rendition and its source screenshot (especially common for content items).
+- **User says the rendition doesn't match the source and asks the agent to bring it closer.** This is the canonical content-item case. Typical phrasings: *"the bar chart looks different from the original"*, *"look at the source screenshot again and make it more aligned"*, *"this doesn't look like the source — can you fix it?"*, *"the chart in the content gallery isn't quite right; please match the source more closely"*. The user does not need to say the words "fidelity" or "drift" or invoke a slash command for this to apply; if their intent is "rendition should look more like the source," refine is the right tool.
 
 ## Speaking to the user — UX principle
 
