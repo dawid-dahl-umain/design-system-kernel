@@ -116,9 +116,15 @@ This pause is correct and intentional. Renditions warrant it because they're the
 - **Placeholders are real, named slots.** When compose later fills a layout rendition, it should be obvious from the HTML where the title goes, where the body goes, where the chart goes. Use semantic class names or data attributes that match the snapshot's placeholder types.
 - **Polish over pixel-perfect.** A tasteful approximation beats a clumsy literal match.
 
-### Reading the source screenshots — fidelity caveats
+### Reading the source screenshots
 
-The screenshots in `snapshot/assets/` are the visual ground truth, but they are not infallible. Treat them with appropriate skepticism, especially for layouts whose distinguishing character is image content.
+The screenshots in `snapshot/assets/` are the **primary spec** for each rendition — not a passive reference for the user's "compare to source" toggle. Before writing any rendition's HTML, load the relevant screenshot and describe in plain words what's actually depicted: the visual regions, the dominant primitives (text, chart, table, photo, diagram), the spatial arrangement, the obvious structural features (rows, columns, grids, sidebars, headers, footers). Generate the rendition from that description; the snapshot's `id` / `type` / `notes` metadata is a hint, not the truth.
+
+Why this matters: the snapshot's `type` label is a structural classifier that may describe an embedded element rather than the slide's overall composition. A slide classified as `bar-chart` because it contains an embedded stacked-column chart can in fact be a five-metric four-region dashboard with that chart as one tile inside it. Generating from metadata alone produces a textbook bar chart and the source character is lost. The same trap applies to layouts (a name like `two-content` may describe one of several possible structures) and examples (the snapshot may capture text content but the spatial structure — 2×2 card grid vs. vertical stack — lives only in the screenshot).
+
+After writing each rendition, **structurally self-check** before moving on: compare the rendition's structure to the screenshot. Count distinct visual regions and dominant primitives on each side. If they don't match — e.g. screenshot has a four-column grid with mini charts and prose blocks, and the rendition has one large chart with a sidebar — the rendition is structurally wrong. Fix and re-generate. A vertical text dump is never a faithful rendition of a slide arranged as a card grid.
+
+The screenshots are visual ground truth, but they are not infallible. Treat them with appropriate skepticism, especially for layouts whose distinguishing character is image content.
 
 - **Prefer example screenshots over layout screenshots when both exist for the same layout.** For each Layout, look up Examples whose `layout_id` matches it. Example screenshots show the layout populated with real content and render at full fidelity (no empty picture placeholders, no synthetic specimen artifacts). When at least one example exists for a layout, treat the example screenshot(s) as the primary visual reference and the layout screenshot as a supporting reference for empty-state structure. When no example exists, the layout screenshot is the only reference.
 
@@ -127,6 +133,8 @@ The screenshots in `snapshot/assets/` are the visual ground truth, but they are 
   - Cross-reference any example screenshots for the same layout; they often show what the layout actually looks like populated.
   - Read the layout's `notes` field; the engine may have flagged a known gap there (e.g. "subtle radial gradient not visible in this render; treat as solid cream").
   - If the layout's name implies imagery the screenshots don't show (e.g. `case-image-light` rendering as a plain cream box), the rendition should still convey that the layout has an image region — render a tasteful placeholder image area, not an empty rectangle.
+
+- **Content screenshots are full-slide captures.** Each `content-screenshots/<id>.png` shows a representative slide containing the catalogued content type, framed at full slide width. The catalogued content may be one tile in a multi-region slide, the dominant primitive of the slide, or anything in between. Read the whole screenshot to identify what's actually being catalogued, then render that — not the textbook version of the snapshot's `type` label. When the slide's overall structure clearly diverges from the `type` label (e.g. `bar-chart` on a comparison-matrix slide), the rendition should reflect the slide's actual structure, and you should flag the misclassification in your run summary so the user can decide whether to re-snapshot with a corrected type.
 
 - **Do not invent decoration the source clearly does not have.** This is the inverse risk. If a layout is genuinely minimal (e.g. a `title-cream` layout is just a cream wash with a title and the company's wordmark), keep the rendition minimal. The skepticism above applies when the screenshot looks impoverished *relative to the source's actual character*, not as license to embellish past what the source shows.
 
@@ -176,9 +184,10 @@ The same principle applies to every brief's "Must include" and "Should consider"
 ## Build order
 
 1. **Resolve rendition styling first** (host design system check → user-provided check → ask the user if neither). Once resolved, hold the chosen styling for use across all renditions in this build.
-2. **Generate renditions.** One file per layout, one file per example, in the structure above.
+2. **Generate renditions.** One file per layout, one file per example, one file per content item, in the structure above. **Per rendition:** load its primary source screenshot, describe what's depicted in plain words, then write the HTML from that description. After writing, structurally self-check the rendition against the screenshot (see the "Reading the source screenshots" section above) before moving to the next.
 3. **Generate library pages.** Each satisfies its brief and embeds the relevant renditions (via iframe or include).
-4. **Validate.** Every layout id in the snapshot has a matching rendition file; same for examples; library pages reference them correctly.
+4. **Validate paths and ids.** Every layout id in the snapshot has a matching rendition file; same for examples and content items; library pages reference them correctly.
+5. **Self-verify renditions against their source screenshots.** Sweep through every rendition one by one — re-read the rendition HTML, look at its source screenshot, and confirm structural correspondence: visible regions match, dominant primitives match, spatial relationships preserved (rows, columns, grids, sidebars, headers). This step is mandatory; do not declare the build done without it. Schema validation in step 4 cannot catch "rendition is structurally unrelated to source" — only this self-check can. Fix any divergent rendition before reporting completion. If you spot a misclassification at the snapshot level (e.g. a slide labelled `bar-chart` that is actually a comparison matrix), flag it in the run summary so the user can decide whether to re-snapshot with a corrected type.
 
 ## After building
 
