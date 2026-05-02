@@ -9,6 +9,19 @@ allowed-tools: Bash(python3 *) Bash(pip *) Bash(libreoffice *)
 
 Extract a `DesignSystemSnapshot` from the source PPT. The "engine" is you, the agent, using your tools — there is no monolithic engine script. This is the PowerPoint engine; other source formats use their own `dsk:snapshot-<format>` engine skill.
 
+## How to run extraction (read this first)
+
+Extraction is **agentic, not scripted.** Run each step of the recipe through tool calls — Bash with inline Python (`python3 -c '...'` or `python3 <<'EOF' ... EOF`) or short standalone invocations. The recipe below is a checklist for you to execute step by step, not a program for you to compile into a single file.
+
+**Do not write a Python file (e.g. `.snapshot-extract.py`, `extract.py`, `dsk-engine.py`) into the project folder.** The company zone is reserved for snapshot artifacts and user content, not for extraction scripts. Principle 2 (everything DSK generates is regenerable from source + manifest) explicitly excludes accumulating extraction code as project clutter.
+
+If a step's logic is genuinely too complex to fit in an inline tool call, write a temporary helper to `/tmp/` (not the project folder), invoke it, and let it disappear with normal temp cleanup. The project folder should never contain a Python file you authored as part of running the snapshot.
+
+Why this matters:
+- **Adaptability.** Inline tool calls let you adjust to per-source quirks (an unusual placeholder type, a corrupt media file, a layout with no name) by reasoning at each step. A monolithic script captures one specific implementation and fails opaquely on edge cases.
+- **Cleanliness.** Re-running snapshot from a clean filesystem produces only the snapshot artifact — no leftover `.snapshot-extract.py` from a previous run.
+- **Principle alignment.** "Behavior level, not implementation" (principle 7) means the SKILL.md describes what to convey; you decide step-by-step how to render it. A single saved program is the opposite of behavior-level execution.
+
 ## Output you produce
 
 You write everything into the **company zone** — the user's project folder, which is your current working directory. NOT into the plugin folder; the plugin (kernel zone) is a separate read-only location accessible via `${CLAUDE_PLUGIN_ROOT}`.
