@@ -62,11 +62,11 @@ flowchart TD
     AskConfig --> WriteManifest["Write the manifest (config: source path + DoF settings)"]
     WriteManifest --> WriteAgentsMd["Write or extend AGENTS.md (project marker; with CLAUDE.md symlink for Claude tooling; existing content preserved, see principle 8)"]
     WriteAgentsMd --> RunSnapshot["Snapshot stage: run the engine skill for the source format (e.g. dsk:snapshot-ppt for PPT)"]
-    RunSnapshot --> SnapshotWritten["Snapshot written: snapshot.json + PNG assets in snapshot/"]
+    RunSnapshot --> SnapshotWritten["Snapshot written: snapshot.json + screenshots + source-media in snapshot/"]
     SnapshotWritten --> Build["Build stage: agent reads the snapshot + the kernel briefs"]
-    Build --> CheckDS{"Design system available? (host feature, or user-provided in project)"}
-    CheckDS -->|Yes| Renditions["Generate renditions: one HTML file per layout, example, and content type, in library/renditions/{layouts,examples,content}/"]
-    CheckDS -->|No| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
+    Build --> CheckDS{"Brand sources for renditions? (host feature, user-provided folder, or source-extracted media)"}
+    CheckDS -->|Covers what's needed| Renditions["Generate renditions: one HTML file per layout, example, and content type, in library/renditions/{layouts,examples,content}/"]
+    CheckDS -->|Specific gap remains| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
     AskUser --> Renditions
     Renditions --> LibraryProduced["Library produced: renditions + browser pages (welcome, layouts, examples, content gallery)"]
     LibraryProduced --> Ready([Ready: users can chat with the agent])
