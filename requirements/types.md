@@ -21,7 +21,6 @@ JSON example:
   "snapshot_version": "0.1",
   "source": {
     "engine": "ppt",
-    "engine_version": "0.1",
     "file": "source/Acme-Master.pptx",
     "extracted_at": "2026-04-25T10:30:00Z"
   },

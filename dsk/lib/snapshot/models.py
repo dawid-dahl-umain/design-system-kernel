@@ -118,7 +118,6 @@ class SourceMedia(BaseModel):
 class SourceMeta(BaseModel):
     model_config = ConfigDict(extra="forbid")
     engine: EngineId
-    engine_version: str
     file: str
     extracted_at: str
 
