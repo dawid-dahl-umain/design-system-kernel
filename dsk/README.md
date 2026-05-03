@@ -38,7 +38,8 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 - `dsk:help` — project state diagnostic and onboarding.
 - `dsk:setup` — first-time install.
 - `dsk:snapshot-ppt` — phase 1: read a PowerPoint source, write snapshot.
-- `dsk:build` — phase 2: read snapshot + briefs, produce **renditions** (web-rendered layouts, examples, and content items reused by compose) plus the **library pages** that browse them. Build's final act is the phase 3 **verify pass** — every rendition tile is held next to its source screenshot and confirmed to match in structure and character (regions, palette, key imagery, brand marks) before the library is declared ready.
+- `dsk:build` — phase 2: read snapshot + briefs, produce **renditions** (web-rendered layouts, examples, and content items reused by compose) plus the **library pages** that browse them.
+- `dsk:align` — phase 3 (the **verify pass**): walk renditions in scope, hold each one next to its source screenshot, and align it to match on structure and character (regions, palette, key imagery, brand marks). Idempotent — clean renditions are left alone. Invoked by `dsk:build` as its closing stage over the whole library; `dsk:setup` and `dsk:sync` invoke it again after build returns as a fresh skill-boundary attention reset over the freshly-built library. Also user-invocable as `/dsk:align`, either over the full library (no arguments) or over a subset (one or more rendition ids, or a natural-language description like "the bar charts").
 - `dsk:compose` — generate a slide by reusing a layout rendition and filling its placeholders.
 - `dsk:refine` — adjust a specific rendition based on user feedback (especially useful for content items like charts, tables, diagrams).
 - `dsk:sync` — reconcile after the declared source changes.

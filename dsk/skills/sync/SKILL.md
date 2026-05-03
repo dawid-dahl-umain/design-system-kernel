@@ -37,10 +37,10 @@ Run when the declared source has been updated and the snapshot is stale.
    - Master visual changes that materially affect existing decks.
 
 4. **Apply changes.**
-   - Additive only: keep the new snapshot in place, regenerate library pages via `dsk:build`, then delete the backup. Done.
-   - Destructive or large: stop. Explain to the user what would change, what the consequence is for any existing decks, and ask for explicit confirmation. On confirm, regenerate library pages and delete the backup. On reject, restore the backup over the new snapshot (so the company zone returns to its pre-sync state) and pause sync.
+   - Additive only: keep the new snapshot in place, regenerate library pages via `dsk:build`, then run a closing alignment pass via `dsk:align` on the regenerated library, then delete the backup. (Build itself ends with an internal align pass; the additional align invocation here is a fresh skill-boundary attention reset, same justification as the closing align pass in `dsk:setup`. Align is idempotent, so the cost when build's internal pass already covered everything is just the read-through.) Done.
+   - Destructive or large: stop. Explain to the user what would change, what the consequence is for any existing decks, and ask for explicit confirmation. On confirm, regenerate library pages, run a closing alignment pass via `dsk:align`, and delete the backup. On reject, restore the backup over the new snapshot (so the company zone returns to its pre-sync state) and pause sync.
 
-5. **Surface the result** to the user: what was applied, what was preserved, and (if any) what to revisit.
+5. **Surface the result** to the user: what was applied, what was preserved, what align found and resolved, and (if any) what to revisit.
 
 ## What sync does not do
 

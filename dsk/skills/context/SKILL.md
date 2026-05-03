@@ -35,7 +35,7 @@ Three named phases:
 
 - **Snapshot stage**: extract a `DesignSystemSnapshot` from the source (slide-specific data plus PNG screenshots). Each source format has its own engine skill: MVP ships `dsk:snapshot-ppt` for PowerPoint. The "engine" is you using the appropriate tools (e.g. python-pptx and LibreOffice for PPT) via tool calls; there is no monolithic engine script. Future engines (`dsk:snapshot-keynote`, `dsk:snapshot-figma`, etc.) are skills that slot in alongside.
 - **Build stage**: read the snapshot plus the kernel briefs and produce two artifact categories — **renditions** (web-rendered layouts, examples, and content items, the actual web slides DSK delivers) and **library pages** (the browser around them). Skill: `dsk:build`.
-- **Verify pass**: the agent's final acceptance gate before declaring the library ready. Every rendition tile is held next to its source screenshot and confirmed to match on both axes — *structure* (regions, primitives, spatial relationships) and *character* (palette, key imagery, brand marks, decorative motifs, overall feel). Anything that diverges on either axis is fixed before the build is declared done. Lives inside `dsk:build`'s responsibility, called out as a discrete phase because a library that looks right on one axis but wrong on the other is a failure even when step-by-step generation looked fine.
+- **Verify pass**: the agent's final acceptance gate before declaring the library ready. Every rendition tile is held next to its source screenshot and confirmed to match on both axes — *structure* (regions, primitives, spatial relationships) and *character* (palette, key imagery, brand marks, decorative motifs, overall feel). Anything that diverges on either axis is fixed before the build is declared done. Implemented by `dsk:align`, which `dsk:build` invokes as its closing stage. `dsk:setup` and `dsk:sync` invoke `dsk:align` again as a fresh skill-boundary pass after build returns — the additional invocation is mechanical, not duplicative: a new skill call gives the agent a fresh attention reset that next-step-in-a-list framing has, in practice, sometimes failed to enforce. Users can also invoke `/dsk:align` directly anytime to run a thorough pass over the existing library without rebuilding from scratch.
 
 ## Rendition read/write rules
 
@@ -44,8 +44,9 @@ Renditions (`library/renditions/{layouts,examples,content}/<id>.html`) are the v
 | Skill | Reads | Writes | Modifies existing renditions? |
 |---|---|---|---|
 | `dsk:build` | snapshot, briefs | renditions + library pages | **Creates** them (overwrites on rebuild) |
+| `dsk:align` | rendition + source screenshot + snapshot entry | the same rendition file (only when drift is found) | **Yes — fidelity-only modifier**. Walks renditions in scope (whole library by default, or a user-specified subset), fixes drift toward source. Idempotent: clean renditions are left alone. |
 | `dsk:compose` | rendition (as template) | new file in `decks/<...>/slide-XX.html` | **No — read-only**. Compose fills placeholders **in memory** and writes a NEW slide file to the deck folder. The rendition stays untouched and is reused by every subsequent slide using that layout. |
-| `dsk:refine` | rendition + source screenshot | the same rendition file | **Yes — sole modifier**. Only touches a rendition when the user explicitly asks for a refinement on that specific id. |
+| `dsk:refine` | rendition + source screenshot | the same rendition file | **Yes — user-directed modifier**. Only touches a rendition when the user explicitly asks for a refinement on that specific id; can apply opt-in web expressivity that align would not. |
 | `dsk:sync` | new snapshot, old snapshot backup | renditions + library pages | **Regenerates** them when the source has changed. |
 
 The single most important rule: **`dsk:compose` never writes back to a rendition file.** A slide is always a new file under `decks/`, never a modification of the rendition. This is what keeps the design system stable across slides — every slide using the same layout starts from the same trusted template.
@@ -53,6 +54,7 @@ The single most important rule: **`dsk:compose` never writes back to a rendition
 User-facing skills layer on top:
 
 - `dsk:setup` orchestrates first-time install.
+- `dsk:align` walks renditions and aligns each to its source. Invoked by `dsk:build`, `dsk:setup`, and `dsk:sync` as their closing pass over the whole library; also user-invocable as `/dsk:align` either with no arguments (full library) or with a subset (one or more ids, or a natural-language description like "the bar charts" or "the title slides").
 - `dsk:compose` generates slides.
 - `dsk:refine` adjusts a specific rendition (layout, example, or content item) based on user feedback. Useful when a rendition drifts from source — common for content items like charts, tables, diagrams.
 - `dsk:sync` reconciles after source changes.
@@ -67,7 +69,7 @@ Three core flows you participate in. This section gives you the operational shap
 - `${CLAUDE_PLUGIN_ROOT}/skills/context/lifecycles.md` — visual mermaid diagrams of each lifecycle. Show these to the user when explaining where they are.
 - `${CLAUDE_PLUGIN_ROOT}/skills/context/walkthrough.md` — end-user-perspective scenarios with `[You]`/`[DSK]` markers. Read this to understand the expected user experience and shape your behavior to match.
 
-- **Setup (once per company).** User drops the declared source file into `source/` and invokes `/dsk:setup`. You ask for company name and DoF settings, write `manifest.yaml` and the `AGENTS.md` DSK section (creating a `CLAUDE.md` symlink so Claude tooling sees the same content), run the snapshot engine skill for the source format (e.g. `dsk:snapshot-ppt` for PowerPoint), then run `dsk:build` to produce the library pages. The build's final verify pass holds every rendition next to its source screenshot and confirms structure and character match before declaring done. Result: project is ready for slide generation.
+- **Setup (once per company).** User drops the declared source file into `source/` and invokes `/dsk:setup`. You ask for company name and DoF settings, write `manifest.yaml` and the `AGENTS.md` DSK section (creating a `CLAUDE.md` symlink so Claude tooling sees the same content), run the snapshot engine skill for the source format (e.g. `dsk:snapshot-ppt` for PowerPoint), then run `dsk:build` to produce the library pages. Build ends with its own internal `dsk:align` invocation as its closing stage; setup invokes `dsk:align` again as a fresh skill-boundary pass over the freshly-generated library. Result: project is ready for slide generation.
 
 - **Compose (per slide, ongoing).** User asks for a slide. You do smart layout selection from the snapshot, then smart content generation, then the DoF decision against the manifest's `silent_up_to` and `ceiling`. At or below `silent_up_to`: generate directly. Above `silent_up_to` but at or below `ceiling`: stop, explain, ask the user to confirm. Above `ceiling`: block; offer the closest valid alternative or invite the user to update the declared source and re-sync. Slides accumulate in `decks/<YYYY-MM-DD>-<slug>/`.
 
