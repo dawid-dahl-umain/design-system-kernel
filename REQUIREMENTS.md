@@ -28,7 +28,7 @@ Each topic lives in its own file under `requirements/`. New readers: start with 
 ### Pipeline (data flowing through DSK)
 
 - [Inputs](requirements/inputs.md) — what DSK always requires
-- [Snapshotting](requirements/snapshotting.md) — stage 1: engine reads source, writes snapshot
+- [Snapshotting](requirements/snapshotting.md) — phase 1: engine reads source, writes snapshot; build and verify (phases 2 and 3) summarized at the end
 - [Content input](requirements/content-input.md) — plain and annotated modes for slide content
 - [Outputs](requirements/outputs.md) — what DSK produces (and what it does not)
 

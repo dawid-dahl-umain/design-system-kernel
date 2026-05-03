@@ -63,11 +63,13 @@ The validator and its Pydantic schema (`models.py`) live at plugin level in `dsk
 
 This pattern applies to future engines too: they describe what to extract via SKILL.md, the agent drives the work, and the shared validator enforces the contract.
 
-## Build (stage 2)
+## Build and verify (phases 2 and 3)
 
-Once snapshotting is done, the Build stage takes over. The agent reads the snapshot and the kernel briefs, then produces the library pages (welcome page, layouts page, examples page, content gallery). Build is agentic and behavior-level (per principle 7); two runs may produce different rendered output while satisfying the same brief contract.
+Once snapshotting is done, the Build phase takes over. The agent reads the snapshot and the kernel briefs and produces renditions plus the library pages (welcome page, layouts page, examples page, content gallery). Build is agentic and behavior-level (per principle 7); two runs may produce different rendered output while satisfying the same brief contract.
 
-Snapshot is data; Build is visual. Keep them separate in your head.
+Build's final act is the **Verify pass**: every rendition tile is held next to its source screenshot and confirmed to match in *character* — palette, key imagery, brand marks, decorative motifs, overall feel — not just structure. Anything that diverges is fixed before the build is declared done. Verify lives inside the build skill's responsibility but is called out as a discrete pipeline phase because it's the moment the agent stands behind the library: a build with structurally-correct but characterologically-off renditions is a failure. See `dsk/skills/build/SKILL.md` for the per-rendition mechanics and `dsk/skills/context/lifecycles.md` for the phase's place in the overall flow.
+
+Snapshot is data; Build is visual; Verify is accountability. Keep the three separate in your head.
 
 ---
 

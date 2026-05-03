@@ -37,8 +37,8 @@ claude --plugin-dir /path/to/design-system-kernel/dsk
 - `dsk:context` — foundational context the agent invokes first on any DSK project (not user-invocable as a slash command).
 - `dsk:help` — project state diagnostic and onboarding.
 - `dsk:setup` — first-time install.
-- `dsk:snapshot-ppt` — stage 1: read a PowerPoint source, write snapshot.
-- `dsk:build` — stage 2: read snapshot + briefs, produce **renditions** (web-rendered layouts, examples, and content items reused by compose) plus the **library pages** that browse them.
+- `dsk:snapshot-ppt` — phase 1: read a PowerPoint source, write snapshot.
+- `dsk:build` — phase 2: read snapshot + briefs, produce **renditions** (web-rendered layouts, examples, and content items reused by compose) plus the **library pages** that browse them. Build's final act is the phase 3 **verify pass** — every rendition tile is held next to its source screenshot and confirmed to match in character (palette, key imagery, brand marks) before the library is declared ready.
 - `dsk:compose` — generate a slide by reusing a layout rendition and filling its placeholders.
 - `dsk:refine` — adjust a specific rendition based on user feedback (especially useful for content items like charts, tables, diagrams).
 - `dsk:sync` — reconcile after the declared source changes.

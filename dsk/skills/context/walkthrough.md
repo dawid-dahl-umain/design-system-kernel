@@ -28,7 +28,8 @@ The typical use of DSK is building out a complete slide deck slide by slide, wit
    **Possible pause for design-system input.** Renditions need styling direction. The agent first checks the runtime for a design system (host-exposed feature like Claude Design's design-system surface, or design tokens / theme files in your project folder). If found, the agent uses it and runs through. If neither is found, the agent stops and asks you in plain English: point at brand guidelines, give it the essentials (colors, fonts, mood), let it approximate from your source screenshots, or use generic tasteful defaults. You pick; the agent acts on the choice for all renditions in this build. Library page chrome doesn't pause — only renditions do, because renditions are the product.
 
    (`library/` is the DSK default — the agent may write to a different location if your host AI Design Tool has its own convention or if you've configured a different path in `manifest.yaml`; the agent will tell you where in that case.)
-8. `[You]` Browse the library pages and confirm the renditions look right.
+8. `[DSK]` Runs the verify pass before declaring the library done. Every rendition tile is held next to its source screenshot and confirmed to match in character — palette, key imagery, brand marks, decorative motifs, overall feel. Any divergence is fixed before completion. This is internal to build; you see it as part of build wrapping up, not as a separate step.
+9. `[You]` Browse the library pages and confirm the renditions look right. The "compare to source" toggle on each entry lets you spot any subtle gap the agent's verify pass didn't catch and ask for refinement.
 
 ## 3. Building a deck
 
@@ -69,7 +70,8 @@ After setup, while browsing the library, you might notice a rendition that doesn
    - Brand/structural divergence → hand off to `dsk:route-extension`; explain that this kind of change should originate in the source.
 5. `[DSK]` Runs a **DoF magnitude check** (same ladder compose uses): if at or below `silent_up_to`, apply silently; if above but at or below `ceiling`, ask you to confirm; if above `ceiling`, block.
 6. `[DSK]` Applies the change to the rendition file. For **layout** renditions, includes a propagation note: "this will apply to every future slide using this layout." For **content** renditions, lighter note: "future slides using this content type will use the refined version." For **example** renditions, no propagation (examples are QA-only).
-7. `[You]` Refresh the library page; the embedded rendition reflects the change.
+7. `[DSK]` Self-verifies: confirms the refined rendition now matches the source on the dimension that prompted the refine, before reporting back to you.
+8. `[You]` Refresh the library page; the embedded rendition reflects the change.
 
 This loop is especially useful for content items (charts, tables, diagrams) where the agent's first pass is most likely to miss source-specific details.
 
@@ -81,8 +83,8 @@ This loop is especially useful for content items (charts, tables, diagrams) wher
 4. `[DSK]` Surfaces: "I notice the source was updated since the last snapshot. Want to sync first?"
 5. `[You]` Confirm.
 6. `[DSK]` Loads `dsk:sync`. Backs up the current snapshot, then invokes the engine skill for the declared source (e.g. `dsk:snapshot-ppt`) to produce a new snapshot. Diffs new vs backup.
-7. `[DSK]` Additive changes only (new layout, new content type): applies silently, regenerates library pages, deletes the backup.
+7. `[DSK]` Additive changes only (new layout, new content type): applies silently, regenerates library pages, runs the verify pass on the regenerated renditions, deletes the backup.
 8. `[DSK]` Destructive or large changes (removed layout, renamed layout, major content shift): stops, explains the change and consequence, asks for explicit confirmation (principle 8).
-   - On confirm: applies, regenerates library pages, deletes the backup.
+   - On confirm: applies, regenerates library pages, runs the verify pass on the regenerated renditions, deletes the backup.
    - On reject: restores the backup over the new snapshot (returns to pre-sync state) and pauses sync.
 9. `[DSK]` Once sync resolves, proceeds with your original action.

@@ -1,7 +1,7 @@
 {
   "name": "dsk",
   "description": "DSK: Slides — the slides plugin in the Design System Kernel (DSK) family. Turns a company's declared slide-system source into a stable snapshot (structured data plus rendered screenshots) that the agent reads to generate on-brand slide decks via chat. Scope today: PowerPoint as source, Claude Design as host. The snapshot is captured once and reused; layouts, examples, and content types stay consistent across sessions and users. Designed vendor-neutral and engine-pluggable; additional source engines (Keynote, Google Slides, Figma, design tokens) and other folder-based hosts are possible future extensions, not currently implemented. DSK as a pattern is artifact-family-neutral; future DSK plugins for posters, reports, or other artifact families would follow the same source → snapshot → renditions shape.",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "author": {
     "name": "Dawid Dahl"
   }

@@ -14,11 +14,11 @@ CLAUDE.md                         # symlink to AGENTS.md so Claude Code/Design r
 .gitignore                        # DSK section between markers (dsk:setup writes/extends); ignores regenerable artifacts
 source/                           # declared source files, PowerPoint for MVP (user-owned)
 manifest.yaml                     # per-company config; see types.md (user-owned)
-snapshot/                         # stage 1 output: structured data + screenshots (regenerable; gitignored)
+snapshot/                         # phase 1 output: structured data + screenshots (regenerable; gitignored)
   .dsk-managed                    # ownership marker (one-line plain text, written by the engine skill)
   snapshot.json
   assets/
-library/                          # stage 2 output: web technologies (regenerable; gitignored)
+library/                          # phase 2 output (verified by phase 3): web technologies (regenerable; gitignored)
   .dsk-managed                    # ownership marker (one-line plain text, written by dsk:build)
   welcome.html                    # browser pages — humans navigate the design system here
   layouts.html
