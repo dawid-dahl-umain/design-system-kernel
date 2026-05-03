@@ -2,10 +2,11 @@
 
 High-level diagrams of the three core DSK lifecycles. Each is an agentic flow; diagrams describe behavior, not implementation (principle 7). Read by you (the agent) when invoked from `dsk:context`; the canonical visual reference for DSK behavior. Show these to the user when explaining where they are in the lifecycle.
 
-The DSK pipeline has two named stages that show up in setup and sync:
+The DSK pipeline has three named phases that show up in setup and sync:
 
 - **Snapshot stage**: an engine skill (`dsk:snapshot-<format>`, e.g. `dsk:snapshot-ppt` for PowerPoint) reads the source of truth and writes the `DesignSystemSnapshot` (slide-specific data plus PNG screenshots). Each source format has its own engine skill; the manifest's `engine` field selects which one.
 - **Build stage**: the agent reads the snapshot and the kernel briefs and produces two artifact categories — **renditions** (web-rendered versions of every layout, example, and content item, the actual slides and content pieces compose reuses) and **library pages** (the browser around them). Visual output, in a different medium than the declared source. Renditions may pause to ask the user for design-system direction; library page chrome does not.
+- **Verify pass**: the agent's final acceptance gate. Every rendition tile is held next to its source screenshot and confirmed to match in *character* — palette, key imagery, brand marks, decorative motifs, overall visual feel — not just structure. Anything that diverges is fixed before the build is declared done. Lives inside the build skill's responsibility but called out as a discrete phase because it's the moment the agent stands behind the library: a build with structurally-correct but characterologically-off renditions is a failure, even when step-by-step generation looked fine.
 
 ## 0. Overview — the whole lifecycle end to end
 
@@ -28,6 +29,7 @@ sequenceDiagram
     DSK->>Files: Write manifest.yaml + AGENTS.md (with CLAUDE.md symlink)
     DSK->>Files: Run snapshot stage
     DSK->>Files: Run build stage
+    DSK->>Files: Verify pass — every rendition matches source in character (palette, key imagery, brand marks)
     DSK-->>You: Ready
 
     Note over You,Files: 3. Build a deck (slide by slide, ongoing)
@@ -69,13 +71,16 @@ flowchart TD
     CheckDS -->|Specific gap remains| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
     AskUser --> Renditions
     Renditions --> LibraryProduced["Library produced: renditions + browser pages (welcome, layouts, examples, content gallery)"]
-    LibraryProduced --> Ready([Ready: users can chat with the agent])
+    LibraryProduced --> Verify["Verify pass: every rendition tile held next to its source screenshot — palette, key imagery, brand marks, decorative motifs, overall feel; fix any divergence before declaring done"]
+    Verify --> Ready([Ready: users can chat with the agent])
 
     classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     classDef buildStage    fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef verifyStage   fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
     classDef clarify       fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
     class RunSnapshot,SnapshotWritten snapshotStage
     class Build,Renditions,LibraryProduced buildStage
+    class Verify verifyStage
     class CheckDS,AskUser clarify
 ```
 
@@ -147,14 +152,17 @@ flowchart TD
     AskUser -->|Reject| Rollback[Restore backup over new snapshot; pause sync]
     AutoApply --> RegenArtifacts["Build stage: regenerate renditions + library pages"]
     Apply --> RegenArtifacts
-    RegenArtifacts --> Cleanup[Delete backup]
+    RegenArtifacts --> Verify["Verify pass: every regenerated rendition matches its source in character; fix any divergence"]
+    Verify --> Cleanup[Delete backup]
     Cleanup --> Done([Synced])
     Rollback --> Done
 
     classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     classDef buildStage    fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef verifyStage   fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
     class ReSnapshot,NewSnapshot snapshotStage
     class RegenArtifacts buildStage
+    class Verify verifyStage
 ```
 
 ## 4. Refine — adjusting a specific rendition
@@ -188,15 +196,18 @@ flowchart TD
     ConfirmContent -->|Rejected| Done
     ConfirmExample -->|Rejected| Done
 
-    Apply --> Done([Rendition file updated; library pages reflect on next reload])
+    Apply --> SelfVerify["Verify: confirm the refined rendition now matches the source on the dimension that prompted the refine"]
+    SelfVerify --> Done([Rendition file updated; library pages reflect on next reload])
     RouteOut --> Done
 
     classDef direction fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
     classDef dof       fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef verifyStage fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
     classDef clarify   fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
     classDef block     fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
     class Direction direction
     class DoFCheck dof
+    class SelfVerify verifyStage
     class AskClarify clarify
     class RouteOut block
 ```
