@@ -6,7 +6,7 @@ The DSK pipeline has three named phases that show up in setup and sync:
 
 - **Snapshot stage**: an engine skill (`dsk:snapshot-<format>`, e.g. `dsk:snapshot-ppt` for PowerPoint) reads the source of truth and writes the `DesignSystemSnapshot` (slide-specific data plus PNG screenshots). Each source format has its own engine skill; the manifest's `engine` field selects which one.
 - **Build stage**: the agent reads the snapshot and the kernel briefs and produces two artifact categories — **renditions** (web-rendered versions of every layout, example, and content item, the actual slides and content pieces compose reuses) and **library pages** (the browser around them). Visual output, in a different medium than the declared source. Renditions may pause to ask the user for design-system direction; library page chrome does not.
-- **Verify pass**: the agent's final acceptance gate. Every rendition tile is held next to its source screenshot and confirmed to match in *character* — palette, key imagery, brand marks, decorative motifs, overall visual feel — not just structure. Anything that diverges is fixed before the build is declared done. Lives inside the build skill's responsibility but called out as a discrete phase because it's the moment the agent stands behind the library: a build with structurally-correct but characterologically-off renditions is a failure, even when step-by-step generation looked fine.
+- **Verify pass**: the agent's final acceptance gate. Every rendition tile is held next to its source screenshot and confirmed to match on both axes — *structure* (regions, primitives, spatial relationships) and *character* (palette, key imagery, brand marks, decorative motifs, overall visual feel). Anything that diverges on either axis is fixed before the build is declared done. Lives inside the build skill's responsibility but called out as a discrete phase because it's the moment the agent stands behind the library: a build with renditions that look right on one axis but wrong on the other is a failure, even when step-by-step generation looked fine.
 
 ## 0. Overview — the whole lifecycle end to end
 
@@ -29,7 +29,7 @@ sequenceDiagram
     DSK->>Files: Write manifest.yaml + AGENTS.md (with CLAUDE.md symlink)
     DSK->>Files: Run snapshot stage
     DSK->>Files: Run build stage
-    DSK->>Files: Verify pass — every rendition matches source in character (palette, key imagery, brand marks)
+    DSK->>Files: Verify pass — every rendition matches source in structure and character (regions, palette, key imagery, brand marks)
     DSK-->>You: Ready
 
     Note over You,Files: 3. Build a deck (slide by slide, ongoing)
@@ -71,7 +71,7 @@ flowchart TD
     CheckDS -->|Specific gap remains| AskUser["Ask user: brand guidelines, essentials, approximate from source, or generic defaults"]
     AskUser --> Renditions
     Renditions --> LibraryProduced["Library produced: renditions + browser pages (welcome, layouts, examples, content gallery)"]
-    LibraryProduced --> Verify["Verify pass: every rendition tile held next to its source screenshot — palette, key imagery, brand marks, decorative motifs, overall feel; fix any divergence before declaring done"]
+    LibraryProduced --> Verify["Verify pass: every rendition tile held next to its source screenshot — structure (regions, primitives, spatial relationships) and character (palette, key imagery, brand marks, decorative motifs, overall feel); fix any divergence before declaring done"]
     Verify --> Ready([Ready: users can chat with the agent])
 
     classDef snapshotStage fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
@@ -152,7 +152,7 @@ flowchart TD
     AskUser -->|Reject| Rollback[Restore backup over new snapshot; pause sync]
     AutoApply --> RegenArtifacts["Build stage: regenerate renditions + library pages"]
     Apply --> RegenArtifacts
-    RegenArtifacts --> Verify["Verify pass: every regenerated rendition matches its source in character; fix any divergence"]
+    RegenArtifacts --> Verify["Verify pass: every regenerated rendition matches its source in structure and character; fix any divergence"]
     Verify --> Cleanup[Delete backup]
     Cleanup --> Done([Synced])
     Rollback --> Done
