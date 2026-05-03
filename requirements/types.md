@@ -66,8 +66,8 @@ JSON example:
       "kind": "raster",
       "role": "decorative",
       "source_ref": "ppt/media/image9.png",
-      "appears_in": ["title-fifth-element", "divider-fifth-element", "title-large-fifth-element"],
-      "notes": "Brand-defining swirling decorative shape; appears across the 'Fifth element' family of layouts."
+      "appears_in": ["title-hero", "divider-hero", "title-large-hero"],
+      "notes": "Decorative artwork applied as a layout-level background fill across the hero family of layouts (title, divider, and large-title variants)."
     }
   ]
 }
