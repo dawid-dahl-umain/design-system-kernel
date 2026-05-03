@@ -87,8 +87,9 @@ For **content item** renditions: light propagation note. Compose uses content re
 3. **Run Layer 1 (direction).** Classify and act per the three categories above. If brand/structural divergence, route out via `dsk:route-extension` — never apply.
 4. **Run Layer 2 (DoF magnitude).** Classify against the manifest thresholds and act on silent / confirm / block per `dsk:dof`'s runtime rules.
 5. **Apply the change.** Open the rendition file, make the edit, save it. Touch only what the user asked about; don't restyle the whole rendition.
-6. **Confirm to the user.** Summarize what changed in one sentence. If it was a layout rendition, remind that the change applies to future slides using that layout.
-7. **Don't auto-rebuild library pages.** The library pages embed renditions via iframe/include, so the refresh is automatic on next browser reload. No need to re-run `dsk:build`.
+6. **Self-verify the change.** Re-read the modified rendition and look at the source screenshot on the dimension that prompted the refine — did the edit actually close the specific gap the user pointed at? If not, fix and re-verify before reporting back. The user trusted you to close a specific gap; don't claim success without checking. This is refine's analogue of build's verify pass, scoped to the one rendition.
+7. **Confirm to the user.** Summarize what changed in one sentence. If it was a layout rendition, remind that the change applies to future slides using that layout.
+8. **Don't auto-rebuild library pages.** The library pages embed renditions via iframe/include, so the refresh is automatic on next browser reload. No need to re-run `dsk:build`.
 
 ## When to fall back to dsk:build
 
